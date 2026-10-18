@@ -1,153 +1,11 @@
-/* recipe-app custom styles layered over gram.css */
-.recipe-toolbar {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin: 1rem 0;
-  flex-wrap: wrap;
-}
-.scale-controls {
-  display: inline-flex;
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  overflow: hidden;
-}
-.scale-btn {
-  border: 0;
-  background: transparent;
-  padding: 0.35rem 0.9rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-.scale-btn.active {
-  background: #4f46e5;
-  color: white;
-}
-.cook-start {
-  border: 0;
-  border-radius: 999px;
-  background: #059669;
-  color: white;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-.cook-bar {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #ecfdf5;
-  border: 1px solid #059669;
-  border-radius: 8px;
-  padding: 0.5rem 0.9rem;
-  margin: 0.5rem 0;
-}
-.recipe-app.cooking .cook-bar {
-  display: block;
-}
-.cook-bar summary {
-  cursor: pointer;
-  font-weight: 600;
-  list-style: none;
-}
-.cook-next {
-  border: 0;
-  border-radius: 999px;
-  background: #4f46e5;
-  color: white;
-  padding: 0.35rem 0.9rem;
-  cursor: pointer;
-  margin-right: 0.5rem;
-}
-.cook-exit {
-  border: 1px solid #999;
-  border-radius: 999px;
-  background: transparent;
-  padding: 0.35rem 0.9rem;
-  cursor: pointer;
-}
-.recipe-app.cooking ol.steps > li {
-  display: none;
-  padding: 1rem;
-  border-radius: 8px;
-}
-.recipe-app.cooking ol.steps > li.cook-active {
-  display: block;
-  background: #eef2ff;
-  border: 2px solid #4f46e5;
-  font-size: 1.15em;
-  line-height: 1.8;
-}
-.recipe-app.cooking section.cook-hidden-section {
-  display: none;
-}
-.recipe-app.cooking .shopping-list,
-.recipe-app.cooking .nutrition-panel,
-.recipe-app.cooking .section-ingredients,
-.recipe-app.cooking .recipe-timings-grid {
-  display: none;
-}
-.gantt-details summary {
-  cursor: pointer;
-  font-weight: 600;
-  margin: 1.5rem 0 0.5rem;
-}
+/* app.css — cookbook-web site chrome: browse, import, cards, print.
+   Recipe-app styles (toolbar, cook mode, snippet) live in the gram
+   extension's gram-app.css. */
 
-/* page title comes from Quarto frontmatter — hide the renderer's duplicate */
-.recipe-render h1 {
-  display: none;
-}
-
-/* --- quick-overview snippet (table-style recipe) --- */
-.snippet-box {
-  margin: 1rem 0 1.5rem;
-}
-.snippet-box summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-table.recipe-snippet {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 0.75rem 0;
-  border: 2px solid #16a34a;
-}
-.recipe-snippet td {
-  border: 1px solid #86efac;
-  vertical-align: top;
-  padding: 0;
-}
-.sn-note {
-  text-align: center;
-  font-weight: 600;
-  padding: 0.4rem 0.75rem !important;
-  background: #f0fdf4;
-}
-.sn-group {
-  padding: 0.4rem 0.75rem !important;
-}
-.sn-action {
-  font-weight: 700;
-  color: #15803d;
-  margin-bottom: 0.35rem;
-}
-.sn-ings {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.sn-ings li {
-  border-top: 1px dashed #bbf7d0;
-  padding: 0.25rem 0;
-  font-size: 0.95em;
-}
-.sn-cook {
-  padding: 0.4rem 0.75rem !important;
-  font-weight: 600;
-  white-space: nowrap;
-  background: #f0fdf4;
-  text-align: center;
+:root {
+  --cb-accent: #16a34a;
+  --cb-accent-dark: #15803d;
+  --cb-accent-soft: #f0fdf4;
 }
 
 /* --- browse table --- */
@@ -195,10 +53,10 @@ table.recipe-snippet {
   content: " ▼";
 }
 .browse-table tbody tr:hover {
-  background: #f0fdf4;
+  background: var(--cb-accent-soft);
 }
 
-/* Import page */
+/* --- import page --- */
 .import-form {
   display: flex;
   flex-direction: column;
@@ -235,6 +93,19 @@ table.recipe-snippet {
   display: flex;
   gap: 0.5rem;
   margin: 0.75rem 0;
+  flex-wrap: wrap;
+}
+.import-actions button {
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.import-actions button:hover {
+  border-color: var(--cb-accent);
+  color: var(--cb-accent-dark);
 }
 #import-status.error {
   color: #b91c1c;
@@ -266,10 +137,63 @@ table.recipe-snippet {
   text-decoration: none;
 }
 .lang-switch .lang-opt.active {
-  background: var(--bs-primary, #0d6efd);
+  background: var(--cb-accent, var(--bs-primary, #0d6efd));
   color: #fff;
   pointer-events: none;
 }
 .lang-switch a.lang-opt:hover:not(.active) {
   background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+/* --- listing cards --- */
+.listing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.listing-card .card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+/* card categories as chips */
+.quarto-grid-item .listing-categories .listing-category {
+  border-radius: 999px;
+  background: var(--cb-accent-soft);
+  color: var(--cb-accent-dark);
+  border: 0;
+  font-size: 0.8em;
+}
+/* text-only cards get a category-tinted banner instead of an image */
+.quarto-grid-item .card-attribution {
+  border-top: 2px solid var(--cb-accent-soft);
+}
+
+/* --- print: clean recipe sheet --- */
+@media print {
+  .navbar,
+  .sidebar,
+  .recipe-toolbar,
+  .cook-bar,
+  .gantt-details,
+  .lang-switch,
+  .page-footer,
+  #toc-collapse,
+  .toc-actions,
+  .code-copy-button,
+  .snippet-box summary::after {
+    display: none !important;
+  }
+  /* force open collapsible sections so the sheet is complete */
+  .snippet-box > *,
+  .gantt-details > * {
+    display: block !important;
+  }
+  .recipe-toolbar {
+    /* keep an at-a-glance header with the yield */
+    display: none;
+  }
+  main {
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
 }
