@@ -1,0 +1,67 @@
+name: Recipe submission → PR
+
+# Community recipes: an issue labeled `recipe-submission` whose body contains a
+# ```gram fenced block becomes a pull request into sources/_submissions/.
+# Review = merge the PR.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  to-pr:
+    if: github.event.label.name == 'recipe-submission'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Extract .gram from issue body
+        id: extract
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: node .github/scripts/issue-to-gram.mjs
+
+      - name: Open PR
+        if: steps.extract.outputs.slug != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          SLUG: ${{ steps.extract.outputs.slug }}
+        run: |
+          BRANCH="recipe/issue-${ISSUE_NUMBER}-${SLUG}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          mkdir -p sources/_submissions
+          mv /tmp/submission.gram "sources/_submissions/${SLUG}.gram"
+          git add sources/_submissions
+          git commit -m "recipe: ${SLUG} (from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR})"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Recipe: ${SLUG} (from issue #${ISSUE_NUMBER})" \
+            --body "Community submission from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR}. Review, move to \`sources/\` or \`sources/fr/\`, add ingredients to \`.gram/ingredients.yaml\`, then merge. Closes #${ISSUE_NUMBER}." \
+            --label "recipe-review"
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "Received — opened PR for \`${SLUG}\`. It will go live after review."
+
+      - name: Comment when no gram block found
+        if: steps.extract.outputs.slug == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "No \`\`\`gram code block found in this issue — nothing to convert. Use the site's Import page or attach a \`.gram\` file inside a \`\`\`gram fenced block."
