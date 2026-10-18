@@ -8,7 +8,7 @@
     "build:css": "cp node_modules/@gram-lang/renderer/gram.css node_modules/@gram-lang/renderer/gantt.css site/css/",
     "build": "npm run build:data && npm run build:js && npm run build:css && cd site && quarto render && cd .. && node fix-fr-chrome.mjs --self-check",
     "check": "gram check \"sources/**/*.gram\"",
-    "test": "node snippet.mjs && node self-check.mjs",
+    "test": "node self-check.mjs",
     "serve": "python3 -m http.server 8801 -d site/_site"
   },
   "type": "commonjs",

@@ -34,10 +34,11 @@ Pour une conversion assistée par IA depuis une URL ou une vidéo YouTube, utili
 
 <div id="import-output" hidden>
   <h3>Brouillon Gram (<code>.gram</code>)</h3>
-  <pre><code></code></pre>
+  <textarea id="import-preview" rows="18" spellcheck="false"></textarea>
   <div class="import-actions">
     <button id="import-download" type="button">Télécharger .gram</button>
     <button id="import-copy" type="button">Copier dans le presse-papiers</button>
+    <button id="import-publish" type="button">Publier sur le cookbook (GitHub)</button>
   </div>
-  <p>Enregistrez le fichier sous <code>recipes/&lt;slug&gt;.gram</code>, ajoutez les ingrédients manquants à <code>.gram/ingredients.yaml</code>, puis lancez <code>npx gram check "recipes/**/*.gram"</code> et reconstruisez.</p>
+  <p>« Publier » ouvre une issue pré-remplie dans le dépôt du cookbook — la recette devient une pull request et sera publiée après relecture. Vous préférez rester en local ? Enregistrez le fichier sous <code>sources/&lt;slug&gt;.gram</code>, ajoutez les ingrédients manquants à <code>.gram/ingredients.yaml</code>, puis lancez <code>npx gram check "sources/**/*.gram"</code> et reconstruisez.</p>
 </div>

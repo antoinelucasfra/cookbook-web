@@ -8,4 +8,4 @@ portions: "6"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/hyderabadi-vegetable-biryani.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/biryani-vegetarien-de-hyderabad >}}
+{{< gram-interactive src="../sources/fr/vegan-biryani.gram" lang="fr" >}}

@@ -5,7 +5,8 @@
     "category": "Tacos",
     "time": 52,
     "portions": "6",
-    "source": "https://connoisseurusveg.com/vegan-tacos/"
+    "source": "https://connoisseurusveg.com/vegan-tacos/",
+    "image": ""
   },
   {
     "slug": "mac-and-cheese-a-la-courge-butternut",
@@ -13,7 +14,8 @@
     "category": "Pâtes",
     "time": 90,
     "portions": "6",
-    "source": "https://www.lovingitvegan.com/vegan-mac-and-cheese/"
+    "source": "https://www.lovingitvegan.com/vegan-mac-and-cheese/",
+    "image": ""
   },
   {
     "slug": "caneles",
@@ -21,7 +23,8 @@
     "category": "Pâtisserie",
     "time": 1516,
     "portions": "10",
-    "source": "Classique de Bordeaux"
+    "source": "Classique de Bordeaux",
+    "image": ""
   },
   {
     "slug": "gateau-au-chocolat",
@@ -29,7 +32,17 @@
     "category": "Dessert",
     "time": 65,
     "portions": "8",
-    "source": "Style brownie classique"
+    "source": "Style brownie classique",
+    "image": ""
+  },
+  {
+    "slug": "creme-au-chocolat",
+    "title": "Crème au chocolat",
+    "category": "Pâtisserie",
+    "time": 16,
+    "portions": "6",
+    "source": "Classique familial français",
+    "image": ""
   },
   {
     "slug": "crepes",
@@ -37,7 +50,8 @@
     "category": "Petit-déjeuner",
     "time": 47.5,
     "portions": "4",
-    "source": "Classique français"
+    "source": "Classique français",
+    "image": ""
   },
   {
     "slug": "falafels-faciles",
@@ -45,7 +59,8 @@
     "category": "Plat",
     "time": 105,
     "portions": "12",
-    "source": "https://minimalistbaker.com/easy-vegan-falafel/"
+    "source": "https://minimalistbaker.com/easy-vegan-falafel/",
+    "image": ""
   },
   {
     "slug": "brownies-fondants-vegetaliens",
@@ -53,7 +68,8 @@
     "category": "Dessert",
     "time": 91,
     "portions": "16",
-    "source": "https://www.lovingitvegan.com/vegan-brownies/"
+    "source": "https://www.lovingitvegan.com/vegan-brownies/",
+    "image": ""
   },
   {
     "slug": "houmous",
@@ -61,7 +77,8 @@
     "category": "Entrée",
     "time": 21,
     "portions": "4",
-    "source": "https://simple-veganista.com/homemade-hummus"
+    "source": "https://simple-veganista.com/homemade-hummus",
+    "image": ""
   },
   {
     "slug": "tarte-au-citron",
@@ -69,7 +86,8 @@
     "category": "Pâtisserie",
     "time": 335,
     "portions": "8",
-    "source": ""
+    "source": "",
+    "image": ""
   },
   {
     "slug": "pancakes",
@@ -77,7 +95,8 @@
     "category": "Petit-déjeuner",
     "time": 17,
     "portions": "2",
-    "source": ""
+    "source": "",
+    "image": ""
   },
   {
     "slug": "pates-au-pesto-cremeux-asperges-et-haricots-beurre",
@@ -85,7 +104,8 @@
     "category": "Pâtes",
     "time": 38,
     "portions": "4",
-    "source": "https://www.cinnamonsnail.com/vegan-pesto-pasta/"
+    "source": "https://www.cinnamonsnail.com/vegan-pesto-pasta/",
+    "image": ""
   },
   {
     "slug": "pates-au-pesto",
@@ -93,7 +113,8 @@
     "category": "Pâtes",
     "time": 27,
     "portions": "2",
-    "source": "À la génoise"
+    "source": "À la génoise",
+    "image": ""
   },
   {
     "slug": "curry-vert-thai-au-tofu-vegetalien",
@@ -101,7 +122,8 @@
     "category": "Thaï",
     "time": 42,
     "portions": "4",
-    "source": "https://cinnamonsnail.com/vegan-green-curry-tofu/"
+    "source": "https://cinnamonsnail.com/vegan-green-curry-tofu/",
+    "image": ""
   },
   {
     "slug": "soupe-de-tomates",
@@ -109,7 +131,8 @@
     "category": "Soupe",
     "time": 52,
     "portions": "4",
-    "source": "Valeur sûre du soir"
+    "source": "Valeur sûre du soir",
+    "image": ""
   },
   {
     "slug": "biryani-vegetarien-de-hyderabad",
@@ -117,7 +140,8 @@
     "category": "Riz",
     "time": 125.5,
     "portions": "6",
-    "source": "https://www.cinnamonsnail.com/vegan-biryani/"
+    "source": "https://www.cinnamonsnail.com/vegan-biryani/",
+    "image": ""
   },
   {
     "slug": "poulet-au-beurre-vegetalien",
@@ -125,7 +149,8 @@
     "category": "Curry",
     "time": 54,
     "portions": "4",
-    "source": "https://connoisseurusveg.com/vegan-butter-chicken/"
+    "source": "https://connoisseurusveg.com/vegan-butter-chicken/",
+    "image": ""
   },
   {
     "slug": "chili-vegetalien",
@@ -133,7 +158,8 @@
     "category": "Chili",
     "time": 76,
     "portions": "6",
-    "source": "https://www.lovingitvegan.com/vegan-chili/"
+    "source": "https://www.lovingitvegan.com/vegan-chili/",
+    "image": ""
   },
   {
     "slug": "nouilles-dan-dan-vegetaliennes",
@@ -141,7 +167,8 @@
     "category": "Chinois",
     "time": 41.5,
     "portions": "4",
-    "source": "https://www.connoisseurusveg.com/vegan-dan-dan-noodles/"
+    "source": "https://www.connoisseurusveg.com/vegan-dan-dan-noodles/",
+    "image": ""
   },
   {
     "slug": "lasagne-vegetalienne",
@@ -149,7 +176,8 @@
     "category": "Plat principal",
     "time": 59,
     "portions": "8",
-    "source": "https://www.lovingitvegan.com/vegan-lasagna/"
+    "source": "https://www.lovingitvegan.com/vegan-lasagna/",
+    "image": ""
   },
   {
     "slug": "pad-thai-vegetalien-pad-mee-korat",
@@ -157,6 +185,7 @@
     "category": "Thaï",
     "time": 140,
     "portions": "2",
-    "source": "https://hot-thai-kitchen.com/vegan-pad-thai/"
+    "source": "https://hot-thai-kitchen.com/vegan-pad-thai/",
+    "image": ""
   }
 ]

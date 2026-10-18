@@ -348,72 +348,6 @@ ${stepLines.join("\n\n")}
   var require_client = __commonJS({
     "client.js"() {
       init_import_parser();
-      function initApp(root) {
-        let data;
-        try {
-          data = JSON.parse(root.querySelector("script.recipe-data").textContent);
-        } catch {
-          return;
-        }
-        const renderEl = root.querySelector(".recipe-render");
-        const ganttEl = root.querySelector(".gantt-render");
-        const btns = [...root.querySelectorAll(".scale-btn")];
-        let scale = "1";
-        function setHTML(el, html) {
-          const frag = new DOMParser().parseFromString(html, "text/html").body;
-          el.replaceChildren(...frag.childNodes);
-        }
-        function render() {
-          setHTML(renderEl, `<div class="gram-preview">${data[scale].html}</div>`);
-          setHTML(ganttEl, data[scale].gantt);
-          const slot = root.querySelector(".snippet-slot");
-          if (slot && data[scale].snippet) setHTML(slot, data[scale].snippet);
-          btns.forEach(
-            (b) => b.classList.toggle("active", b.dataset.scale === scale)
-          );
-          exitCookMode();
-        }
-        btns.forEach((b) => b.addEventListener("click", () => {
-          scale = b.dataset.scale;
-          render();
-        }));
-        const cookBar = root.querySelector(".cook-bar");
-        const cookLabel = root.querySelector(".cook-step-label");
-        function steps() {
-          return [...renderEl.querySelectorAll("ol.steps > li")];
-        }
-        function exitCookMode() {
-          root.classList.remove("cooking");
-          steps().forEach((s) => s.classList.remove("cook-active", "cook-done", "cook-pending"));
-          cookBar?.removeAttribute("open");
-        }
-        function showStep(i) {
-          const ss = steps();
-          if (i >= ss.length) return exitCookMode();
-          root.classList.add("cooking");
-          if (cookBar) cookBar.setAttribute("open", "");
-          ss.forEach((s, j) => {
-            s.classList.toggle("cook-active", j === i);
-            s.classList.toggle("cook-done", j < i);
-            s.classList.toggle("cook-pending", j > i);
-          });
-          const secs = [...renderEl.querySelectorAll("section")];
-          const active = ss[i].closest("section");
-          secs.forEach(
-            (s) => s.classList.toggle("cook-hidden-section", s !== active && !s.contains(ss[i]))
-          );
-          cookLabel.textContent = `${document.documentElement.lang === "fr" ? "\xC9tape" : "Step"} ${i + 1}/${ss.length}`;
-          ss[i].scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        root.querySelector(".cook-start")?.addEventListener("click", () => showStep(0));
-        root.querySelector(".cook-next")?.addEventListener("click", () => {
-          const i = steps().findIndex((s) => s.classList.contains("cook-active"));
-          showStep(i + 1);
-        });
-        root.querySelector(".cook-exit")?.addEventListener("click", exitCookMode);
-        render();
-      }
-      document.querySelectorAll(".recipe-app").forEach(initApp);
       function fmtTime(min) {
         if (min == null) return "";
         const h = Math.floor(min / 60), m = Math.round(min % 60);
@@ -498,6 +432,8 @@ ${stepLines.join("\n\n")}
         }
         throw lastErr ?? new Error("fetch failed");
       }
+      var GITHUB_REPO = "antoinelucasfra/cookbook-web";
+      var ISSUE_URL_LIMIT = 6e3;
       function initImport() {
         const form = document.querySelector("#import-form");
         if (!form) return;
@@ -512,7 +448,11 @@ ${stepLines.join("\n\n")}
           urlPrefix: "L\u2019URL doit commencer par http(s)://",
           fetching: "R\xE9cup\xE9ration\u2026",
           failed: (m) => `\xC9chec de l\u2019import : ${m}. Collez plut\xF4t le texte de la recette.`,
-          copied: "Copi\xE9 dans le presse-papiers."
+          copied: "Copi\xE9 dans le presse-papiers.",
+          publish: "Publier sur le cookbook (GitHub)",
+          publishing: "Ouvre une page GitHub\u2026",
+          tooLong: "Recette trop longue pour le formulaire GitHub : t\xE9l\xE9chargez le fichier .gram et joignez-le \xE0 une issue.",
+          issueIntro: "Recette propos\xE9e via la page Import du site."
         } : {
           needsReview: "\u26A0 Needs review \u2014 AI translation recommended for these:",
           aiTip: "Try `npx gram import <url> --pick-model` for AI-assisted conversion.",
@@ -523,7 +463,11 @@ ${stepLines.join("\n\n")}
           urlPrefix: "URL must start with http(s)://",
           fetching: "Fetching\u2026",
           failed: (m) => `Import failed: ${m}. Paste the recipe text instead.`,
-          copied: "Copied to clipboard."
+          copied: "Copied to clipboard.",
+          publish: "Publish to the cookbook (GitHub)",
+          publishing: "Opens a GitHub page\u2026",
+          tooLong: "Recipe too long for the GitHub form: download the .gram file and attach it to an issue.",
+          issueIntro: "Recipe submitted through the site's Import page."
         };
         const urlIn = document.querySelector("#import-url");
         const textEl = document.querySelector("#import-text");
@@ -606,6 +550,24 @@ ${stepLines.join("\n\n")}
           a.download = `${slug}.gram`;
           a.click();
           URL.revokeObjectURL(a.href);
+        });
+        document.querySelector("#import-publish")?.addEventListener("click", () => {
+          const gram = currentText();
+          if (!gram) return;
+          const title = gram.match(/^title: (.+)$/m)?.[1] ?? (fr ? "Recette" : "Recipe");
+          const body = `${T.issueIntro}
+
+\`\`\`gram
+${gram}
+\`\`\`
+`;
+          const issueUrl = `https://github.com/${GITHUB_REPO}/issues/new?title=${encodeURIComponent("[recipe] " + title)}&body=${encodeURIComponent(body)}`;
+          if (issueUrl.length > ISSUE_URL_LIMIT) {
+            show(T.tooLong, true);
+            return;
+          }
+          show(T.publishing);
+          window.open(issueUrl, "_blank", "noopener");
         });
       }
       initImport();
