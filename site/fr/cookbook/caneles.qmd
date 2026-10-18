@@ -8,4 +8,4 @@ portions: "10"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/canneles.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/caneles >}}
+{{< gram-interactive src="../sources/fr/canneles.gram" lang="fr" >}}

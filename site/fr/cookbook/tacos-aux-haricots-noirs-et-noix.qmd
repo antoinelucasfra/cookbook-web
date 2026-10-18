@@ -8,4 +8,4 @@ portions: "6"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/vegan-black-bean-walnut-tacos.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/tacos-aux-haricots-noirs-et-noix >}}
+{{< gram-interactive src="../sources/fr/black-bean-walnut-tacos.gram" lang="fr" >}}

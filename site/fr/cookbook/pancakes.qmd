@@ -8,4 +8,4 @@ portions: "2"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/pancakes.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/pancakes >}}
+{{< gram-interactive src="../sources/fr/pancakes.gram" lang="fr" >}}

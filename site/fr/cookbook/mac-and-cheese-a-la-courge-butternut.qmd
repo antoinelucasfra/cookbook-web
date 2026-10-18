@@ -8,4 +8,4 @@ portions: "6"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/butternut-squash-mac-and-cheese.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/mac-and-cheese-a-la-courge-butternut >}}
+{{< gram-interactive src="../sources/fr/butternut-mac-and-cheese.gram" lang="fr" >}}

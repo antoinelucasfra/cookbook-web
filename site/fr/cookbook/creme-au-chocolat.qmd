@@ -1,0 +1,11 @@
+---
+title: "Crème au chocolat"
+lang: fr
+category: "Pâtisserie"
+total_time: "16 min"
+portions: "6"
+---
+
+<nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span></nav>
+
+{{< gram-interactive src="../sources/fr/creme-au-chocolat.gram" lang="fr" >}}

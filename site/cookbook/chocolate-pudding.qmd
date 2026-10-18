@@ -1,0 +1,10 @@
+---
+title: "Chocolate Pudding"
+category: "Dessert"
+total_time: "16 min"
+portions: "6"
+---
+
+<nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">EN</span></nav>
+
+{{< gram-interactive src="../sources/chocolate-pudding.gram" lang="en" >}}

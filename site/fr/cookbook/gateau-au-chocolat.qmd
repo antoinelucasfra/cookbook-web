@@ -8,4 +8,4 @@ portions: "8"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/chocolate-cake.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/gateau-au-chocolat >}}
+{{< gram-interactive src="../sources/fr/chocolate-cake.gram" lang="fr" >}}

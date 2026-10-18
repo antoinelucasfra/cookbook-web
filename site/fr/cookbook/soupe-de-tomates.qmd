@@ -8,4 +8,4 @@ portions: "4"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/tomato-soup.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/soupe-de-tomates >}}
+{{< gram-interactive src="../sources/fr/tomato-soup.gram" lang="fr" >}}
