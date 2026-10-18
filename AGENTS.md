@@ -14,24 +14,33 @@ HTML at build time.
 
 ```
 sources/**/*.gram                    ──┐
-.gram/ingredients.yaml (ingredient DB)  ├──> build.mjs ──> site/_includes/*.{html,json}
+.gram/ingredients.yaml (ingredient DB)  ├──> build.mjs ──> site/cookbook/*.qmd + recipes-index*.json
                                       ──┘                  │
                                                             ├──> Quarto render ──> site/_site/
-                                       client.js ──esbuild──> site/recipe-app.js  (scale, cook mode, import)
-```
+                                       client.js ──esbuild──> site/recipe-app.js  (browse, import)
+`
+
+Recipe pages embed `{{< gram-interactive src=... >}}`; the vendored gram
+extension (`site/_extensions/gram/`, synced from the gram-quarto repo)
+compiles all scales at render time and serves the interactive app
+(scale switcher, cook mode) from `gram-app.js`.
 
 ### Build pipeline
 
 `npm run build` runs four stages:
 
-1. **`build.mjs`** — Compiles every `.gram` × scale (0.5×, 1×, 2×, 3×) → HTML +
-   Gantt + snippet JSON into `site/_includes/`. Also builds two per-language
+1. **`build.mjs`** — Compiles each recipe once to extract metadata, writes
+   per-recipe pages `site/cookbook/<slug>.qmd` (EN) and `site/fr/cookbook/`
+   (FR) embedding `{{< gram-interactive >}}`, and builds two per-language
    index JSON files: `recipes-index.json` (EN), `recipes-index-fr.json` (FR) — filenames kept stable (build outputs); only source dir renamed.
    Ingredient DB loaded from `.gram/ingredients.yaml`.
-2. **`esbuild`** — Bundles `client.js` (imports `@gram-lang/renderer`) →
-   `site/recipe-app.js` (IIFE format). Powers: scale switcher, cook mode, browse
-   filter table, Import page.
-3. **`quarto render`** — Renders the `site/` Quarto project → `site/_site/`.
+2. **`esbuild`** — Bundles `client.js` → `site/recipe-app.js` (IIFE format).
+   Powers the browse filter table and the Import page. Scale switching and
+   cook mode come from the gram extension's `gram-app.js`, injected
+   automatically on pages with recipes.
+3. **`quarto render`** — Renders the `site/` Quarto project → `site/_site/`
+   (the gram extension compiles recipes here, cached in
+   `site/.quarto-gram-cache/`).
 4. **`fix-fr-chrome.mjs --self-check`** — Fixes French Chrome rendering quirks;
    runs self-check.
 
@@ -59,19 +68,20 @@ When adding an ingredient, include both EN and FR names/aliases.
 | `sources/_drafts/` | In-progress drafts (from `import-parser.mjs`) |
 | `.gram/ingredients.yaml` | Ingredient DB (densities, nutrition, EN+FR names) |
 | `.gram/config.yaml` | Gram configuration |
-| `build.mjs` | Main build: compiles all `.gram` → HTML + JSON in `site/_includes/` |
-| `snippet.mjs` | Gram → table-style quick-overview snippet |
+| `build.mjs` | Main build: recipe metadata → per-recipe pages + index JSON |
 | `import-parser.mjs` | Recipe text / schema.org JSON-LD → `.gram` draft (unit conversion to g/ml) |
-| `client.js` | Recipe interactivity (bundled → `site/recipe-app.js`) |
+| `client.js` | Browse table + Import page (bundled → `site/recipe-app.js`) |
 | `site/` | Quarto website project |
 | `site/_quarto.yml` | Quarto config (filters: `gram`, navbar, bilingual links) |
-| `site/_includes/` | Compiled recipe HTML + JSON (generated) |
+| `site/_extensions/gram/` | Vendored gram-quarto extension (synced from gram-quarto repo) |
 | `site/_site/` | Quarto rendered output (generated, gitignored) |
-| `site/css/` | `gram.css`, `gantt.css`, `app.css` |
+| `site/css/` | `gram.css`, `gantt.css`, `app.css` (app chrome; recipe styles in the extension) |
 | `site/recipe-app.js` | Bundled client JS (generated) |
-| `site/cookbook/` | English rendered recipes |
-| `site/fr/cookbook/` | French rendered recipes |
-| `.quarto-gram-cache/` | Gram compilation cache (gitignored) |
+| `site/images/` | Recipe photos (`image:` front-matter in `.gram` points here) |
+| `site/cookbook/` | English rendered recipes (generated) |
+| `site/fr/cookbook/` | French rendered recipes (generated) |
+| `sources/_submissions/` | Community recipes from GitHub issues (PRs add files here) |
+| `site/.quarto-gram-cache/` | Gram compilation cache (gitignored) |
 
 ## Bilingual site
 
@@ -90,7 +100,7 @@ npm install
 npm run build     # gram pipeline + esbuild + quarto render + self-check
 npm run serve     # python3 -m http.server 8801 -d site/_site
 npm run check     # gram check "sources/**/*.gram"
-npm test          # node snippet.mjs && node self-check.mjs
+npm test          # node self-check.mjs
 ```
 
 ### Adding a recipe

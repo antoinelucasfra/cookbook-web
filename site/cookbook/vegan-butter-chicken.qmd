@@ -7,4 +7,4 @@ portions: "4"
 
 <nav class="lang-switch" aria-label="Language"><a class="lang-opt" href="../fr/cookbook/poulet-au-beurre-vegetalien.html" hreflang="fr" lang="fr">FR</a><span class="lang-opt active" aria-current="true">EN</span></nav>
 
-{{< recipe vegan-butter-chicken >}}
+{{< gram-interactive src="../sources/vegan-butter-chicken.gram" lang="en" >}}

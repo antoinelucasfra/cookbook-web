@@ -8,4 +8,4 @@ portions: "4"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/crepes.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/crepes >}}
+{{< gram-interactive src="../sources/fr/crepes.gram" lang="fr" >}}

@@ -6,10 +6,15 @@ Recipe site powered by the [Gram DSL](https://gram-lang.org) + Quarto.
 
 - `sources/**/*.gram` — source of truth (one file per recipe, `sources/bases/` for reusable modules)
 - `.gram/ingredients.yaml` — ingredient DB (densities, yields, nutrition)
-- `build.mjs` — compiles every recipe × scale (0.5/1/2/3×) → HTML + Gantt + snippet JSON in `site/_includes/`
-- `snippet.mjs` — gram recipe → table-style quick-overview snippet (action columns + ingredient rows, like `recipe-format-sugg.png`)
+- `build.mjs` — compiles each recipe once → metadata; writes per-recipe Quarto pages
+  (`site/cookbook/*.qmd`) embedding `{{< gram-interactive >}}`, and the two browse
+  indexes `site/recipes-index.json` / `-fr.json`
+- `site/_extensions/gram/` — vendored [gram-quarto](https://github.com/antoinelucasfra/gram-quarto)
+  extension; compiles recipes × scales at render time and ships the interactive app
+  (scale switcher, cook mode) — sync from the gram-quarto repo when it changes
 - `import-parser.mjs` — recipe text / schema.org JSON-LD → Gram draft (unit conversion to g/ml); self-check via `npm test`
-- `client.js` → `site/recipe-app.js` — scale switcher (also swaps the snippet), cook mode, the Browse page filter table, and the Import page (URL / raw text → `.gram` draft)
+- `client.js` → `site/recipe-app.js` — the Browse page filter table and the Import page
+  (URL / raw text → `.gram` draft → download or "Publish" to GitHub)
 - `site/` — Quarto website (output: `site/_site/`)
 
 ## Commands
@@ -20,8 +25,20 @@ Recipe site powered by the [Gram DSL](https://gram-lang.org) + Quarto.
 
 ## Adding a recipe
 
-Write `sources/<slug>.gram` (VS Code: "Gram - Recipe Language" extension), then
-`npx gram check "sources/**/*.gram"` and `npm run build`.
+Two ways:
+
+1. **From the site** — Import tab, paste text or a URL, review the draft, then
+   "Publish to the cookbook": it opens a prefilled GitHub issue. Adding the
+   `recipe-submission` label to that issue makes CI open a PR with the `.gram`
+   file in `sources/_submissions/`. Review, move it to `sources/` (EN) or
+   `sources/fr/` (FR), extend `.gram/ingredients.yaml` with missing
+   ingredients, merge.
+2. **Locally** — write `sources/<slug>.gram` (VS Code: "Gram - Recipe Language"
+   extension), then `npx gram check "sources/**/*.gram"` and `npm run build`.
+
+Optional recipe photo: set `image: /images/<slug>.jpg` in the `.gram` front-matter
+and drop the file in `site/images/`. It shows on the home-page card, and Quarto
+uses it for Open Graph tags. Recipes without a photo render text-only cards.
 
 ## Translating an external recipe into Gram
 

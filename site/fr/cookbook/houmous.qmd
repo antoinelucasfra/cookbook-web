@@ -8,4 +8,4 @@ portions: "4"
 
 <nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span><a class="lang-opt" href="../../cookbook/hummus.html" hreflang="en" lang="en">EN</a></nav>
 
-{{< recipe fr/houmous >}}
+{{< gram-interactive src="../sources/fr/hummus.gram" lang="fr" >}}
