@@ -359,7 +359,7 @@ ${stepLines.join("\n\n")}
         let recipes;
         const fr = document.documentElement.lang === "fr";
         try {
-          recipes = await (await fetch(fr ? "../recipes-index-fr.json" : "recipes-index.json")).json();
+          recipes = await (await fetch(fr ? "recipes-index-fr.json" : "../recipes-index-en.json")).json();
         } catch {
           table.textContent = fr ? "\xC9chec du chargement de l\u2019index des recettes." : "Failed to load recipe index.";
           return;
@@ -396,7 +396,22 @@ ${stepLines.join("\n\n")}
               link.href = `cookbook/${r.slug}.html`;
               link.textContent = r.title;
               const titleTd = document.createElement("td");
-              titleTd.append(link);
+              titleTd.className = "browse-title-cell";
+              const imgPrefix = fr ? "images/" : "../images/";
+              if (r.image) {
+                const img = document.createElement("img");
+                img.src = r.image.startsWith("http") ? r.image : `${imgPrefix}${r.slug}.jpg`;
+                img.alt = "";
+                img.loading = "lazy";
+                img.className = "browse-thumb";
+                titleTd.append(img, link);
+              } else {
+                const badge = document.createElement("span");
+                badge.className = "browse-thumb browse-thumb-fallback";
+                badge.textContent = (r.title || "?")[0].toUpperCase();
+                badge.dataset.cat = r.category;
+                titleTd.append(badge, link);
+              }
               tr.append(titleTd, td(r.category), td(fmtTime(r.time)), td(r.portions), td(r.source ?? ""));
               return tr;
             })
@@ -571,6 +586,16 @@ ${gram}
         });
       }
       initImport();
+      if (document.documentElement.lang !== "fr") {
+        for (const a of document.querySelectorAll(".navbar-nav .nav-link, .navbar-nav .dropdown-item")) {
+          if (a.textContent.trim() === "Parcourir") a.textContent = "Browse";
+          if (a.textContent.trim() === "Importer") a.textContent = "Import";
+        }
+        for (const el of document.querySelectorAll(".page-footer, footer")) {
+          if (el.textContent.includes("Cuisin\xE9 avec"))
+            el.innerHTML = el.innerHTML.replaceAll("Cuisin\xE9 avec", "Cooked with");
+        }
+      }
     }
   });
   require_client();

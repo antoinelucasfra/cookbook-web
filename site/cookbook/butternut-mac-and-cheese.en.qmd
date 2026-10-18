@@ -1,0 +1,8 @@
+---
+title: "Mac and cheese à la courge butternut"
+category: "Pâtes"
+total_time: "90 min"
+portions: "6"
+---
+
+{{< gram-interactive src="sources/butternut-mac-and-cheese.gram" lang="en" >}}

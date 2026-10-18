@@ -23,8 +23,8 @@ async function initBrowse() {
   let recipes;
   const fr = document.documentElement.lang === "fr";
   try {
-    // fr pages live under /fr/ → index is one level up
-    recipes = await (await fetch(fr ? "../recipes-index-fr.json" : "recipes-index.json")).json();
+    // fr (main language) renders at site root; en renders under /en/
+    recipes = await (await fetch(fr ? "recipes-index-fr.json" : "../recipes-index-en.json")).json();
   } catch {
     table.textContent = fr
       ? "Échec du chargement de l’index des recettes."
@@ -69,7 +69,24 @@ async function initBrowse() {
         link.href = `cookbook/${r.slug}.html`;
         link.textContent = r.title;
         const titleTd = document.createElement("td");
-        titleTd.append(link);
+        titleTd.className = "browse-title-cell";
+        // thumbnail: real photo when site/images/<slug>.jpg exists, else a
+        // category-tinted initial badge (photos are optional)
+        const imgPrefix = fr ? "images/" : "../images/";
+        if (r.image) {
+          const img = document.createElement("img");
+          img.src = r.image.startsWith("http") ? r.image : `${imgPrefix}${r.slug}.jpg`;
+          img.alt = "";
+          img.loading = "lazy";
+          img.className = "browse-thumb";
+          titleTd.append(img, link);
+        } else {
+          const badge = document.createElement("span");
+          badge.className = "browse-thumb browse-thumb-fallback";
+          badge.textContent = (r.title || "?")[0].toUpperCase();
+          badge.dataset.cat = r.category;
+          titleTd.append(badge, link);
+        }
         tr.append(titleTd, td(r.category), td(fmtTime(r.time)), td(r.portions), td(r.source ?? ""));
         return tr;
       })
@@ -263,3 +280,17 @@ function initImport() {
   });
 }
 initImport();
+
+// --- site chrome: Quarto 1.9 language profiles append navbar lists instead of
+// replacing them, so babelquarto can't carry per-language labels — translate
+// the few fixed strings client-side on EN pages (labels are stable)
+if (document.documentElement.lang !== "fr") {
+  for (const a of document.querySelectorAll(".navbar-nav .nav-link, .navbar-nav .dropdown-item")) {
+    if (a.textContent.trim() === "Parcourir") a.textContent = "Browse";
+    if (a.textContent.trim() === "Importer") a.textContent = "Import";
+  }
+  for (const el of document.querySelectorAll(".page-footer, footer")) {
+    if (el.textContent.includes("Cuisiné avec"))
+      el.innerHTML = el.innerHTML.replaceAll("Cuisiné avec", "Cooked with");
+  }
+}

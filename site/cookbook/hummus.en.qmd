@@ -1,0 +1,8 @@
+---
+title: "Houmous"
+category: "Entrée"
+total_time: "21 min"
+portions: "4"
+---
+
+{{< gram-interactive src="sources/hummus.gram" lang="en" >}}

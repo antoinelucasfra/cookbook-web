@@ -1,0 +1,8 @@
+---
+title: "Tacos aux haricots noirs et noix"
+category: "Tacos"
+total_time: "52 min"
+portions: "6"
+---
+
+{{< gram-interactive src="sources/black-bean-walnut-tacos.gram" lang="en" >}}

@@ -1,0 +1,8 @@
+---
+title: "Creamy Pesto Pasta with Asparagus & Butter Beans"
+category: "Pasta"
+total_time: "36 min"
+portions: "4"
+---
+
+{{< gram-interactive src="sources/pesto-asparagus-pasta.gram" lang="fr" >}}

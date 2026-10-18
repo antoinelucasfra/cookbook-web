@@ -1,0 +1,8 @@
+---
+title: "Curry vert thaï au tofu (végétalien)"
+category: "Thaï"
+total_time: "42 min"
+portions: "4"
+---
+
+{{< gram-interactive src="sources/thai-green-curry-tofu.gram" lang="en" >}}

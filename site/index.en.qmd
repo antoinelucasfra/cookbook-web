@@ -1,0 +1,32 @@
+---
+title: "Welcome to the Cookbook"
+lang: en
+---
+
+This site is a recipe book powered by [Gram](https://gram-lang.org), a simple
+text format for writing recipes, and [Quarto](https://quarto.org). Every recipe
+is a `.gram` file compiled into an interactive page when the site is built.
+
+## How to follow a recipe
+
+- **Quick overview** — at the top of each page, a table: the columns are the
+  actions (Mix, Heat, Bake…), the rows list what goes into them (quantities
+  scale automatically), and the right cell shows temperature and time. It's the
+  whole recipe in one glance.
+- **Full steps** — detailed step-by-step instructions with intermediate mixes
+  and a timeline chart.
+- **Cook mode** — click *Start cooking* on any recipe page to walk through
+  steps hands-free; the current step stays centered while you work.
+
+Use the **scale buttons** (½×–3×) on a recipe page to adjust portions; every
+quantity, the overview table, and timings update instantly.
+
+## A live example
+
+{{< gram-interactive src="sources/pancakes.gram" lang="en" scales="1" >}}
+
+## Where to go next
+
+The **Browse** table filters and sorts all recipes by title, category, time, or
+portions. The **Import** tab converts a recipe found on the web into Gram
+format and submits it to the cookbook.

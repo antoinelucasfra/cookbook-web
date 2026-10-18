@@ -244,3 +244,51 @@ console.log(
     `unextracted-time tag: ${JSON.stringify(tags)}`,
   );
 }
+
+// --- built-site checks: node self-check.mjs --site (after quarto render) ---
+if (process.argv.includes("--site")) {
+  import("node:fs").then(({ readFileSync, readdirSync, existsSync }) => {
+    const walkHtml = (dir) =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+        const p = `${dir}/${e.name}`;
+        return e.isDirectory()
+          ? walkHtml(p)
+          : p.endsWith(".html")
+            ? [p]
+            : [];
+      });
+    const pages = walkHtml("site/_site");
+    let bad = 0;
+    for (const p of pages) {
+      const html = readFileSync(p, "utf8");
+      if (html.includes("{{LANGSWITCH}}")) {
+        console.error(`FAIL: literal LANGSWITCH in ${p}`);
+        bad++;
+      }
+      if (html.includes("undefined.html")) {
+        console.error(`FAIL: undefined.html link in ${p}`);
+        bad++;
+      }
+    }
+    // EN/FR parity of generated pages + index data
+    const fr = JSON.parse(readFileSync("site/recipes-index-fr.json", "utf8"));
+    const en = JSON.parse(readFileSync("site/recipes-index-en.json", "utf8"));
+    const frSlugs = new Set(fr.map((r) => r.slug));
+    const enSlugs = new Set(en.map((r) => r.slug));
+    const singles = [...frSlugs].filter((s) => !enSlugs.has(s));
+    const singlesEn = [...enSlugs].filter((s) => !frSlugs.has(s));
+    for (const s of [...singles, ...singlesEn])
+      console.warn(
+        `⚠ single-language recipe "${s}" — EN/FR translation warmly encouraged`,
+      );
+    if (!existsSync("site/_site/index.html"))
+      (console.error("FAIL: no site/_site/index.html"), bad++);
+    const enIndex = "site/_site/en/index.html";
+    if (existsSync("site/_site/en") && !existsSync(enIndex))
+      (console.error(`FAIL: missing ${enIndex}`), bad++);
+    console.log(
+      `${pages.length} pages checked, ${bad} failure(s) — ${bad ? "SITE CHECK FAILED" : "site self-check OK"}`,
+    );
+    if (bad) process.exitCode = 1;
+  });
+}

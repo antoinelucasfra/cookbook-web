@@ -1,9 +1,11 @@
 // build.mjs — .gram sources → index JSON + per-recipe Quarto pages
-// Page bodies use {{< gram-interactive >}} from the vendored gram extension,
-// which compiles all scales at quarto render time. This script only:
+// babelquarto layout: main language (fr) pages are <slug>.qmd, the further
+// language (en) pages are <slug>.en.qmd, both in site/cookbook/. This script:
 //   - compiles each recipe once to extract metadata (title, time, portions…)
-//   - writes site/cookbook/<slug>.qmd (EN) and site/fr/cookbook/<slug>.qmd (FR)
-//   - writes recipes-index.json / recipes-index-fr.json for the browse table
+//   - writes site/cookbook/<slug>.qmd (FR) and site/cookbook/<slug>.en.qmd (EN)
+//   - writes recipes-index-fr.json / recipes-index-en.json for the browse table
+//   - adds a callout to single-language recipes (missing counterpart)
+// Language switching itself is babelquarto's job (navbar button).
 // Usage: node build.mjs
 import {
   readdirSync,
@@ -13,19 +15,22 @@ import {
   rmSync,
 } from "node:fs";
 import { join, basename } from "node:path";
-import { runPipeline } from "@gram-lang/cli";
-import { load } from "js-yaml";
+import { getAST } from "@gram-lang/parser";
+import { compile } from "@gram-lang/kitchen";
+import { analyze } from "@gram-lang/analyzer";
+import yaml from "yaml";
+const { load } = yaml;
 
 const DB = (() => {
-  const raw = load(readFileSync(".gram/ingredients.yaml", "utf8"));
+  const raw = yaml.parse(readFileSync("site/.gram/ingredients.yaml", "utf8"));
   return raw.ingredients ?? raw;
 })();
 
-function listGram(dir) {
+function listGram(dir, excludeFr = false) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory()
-      ? e.name === "_submissions"
-        ? [] // staged submission PRs — published only after a reviewer moves them
+      ? e.name === "_submissions" || (excludeFr && e.name === "fr")
+        ? [] // staged submissions are published after review; fr/ has its own pass
         : listGram(join(dir, e.name))
       : e.name.endsWith(".gram")
         ? [join(dir, e.name)]
@@ -33,39 +38,41 @@ function listGram(dir) {
   ).map((f) => f.replace(/\\/g, "/"));
 }
 
+// compile one source and analyze against the ingredient DB (metadata + nutrition)
+function buildRecipe(file, lang) {
+  const ast = getAST(readFileSync(file, "utf8"));
+  const compiled = compile(ast);
+  const analyzed = analyze(compiled, DB, { lang });
+  return (analyzed && analyzed.result) || compiled;
+}
+
 rmSync("site/cookbook", { recursive: true, force: true });
-rmSync("site/recipes-index.json", { force: true });
 mkdirSync("site/cookbook", { recursive: true });
-mkdirSync("site/fr/cookbook", { recursive: true });
 
 // src path used in the {{< gram-interactive >}} shortcode, relative to the
 // Quarto project dir (site/)
-const srcPath = (file) => `../${file.replace(/\\/g, "/")}`;
+const srcPath = (file) => `sources/${basename(file)}`;
 
 // escape YAML double-quoted scalars
 const q = (s) => String(s).replace(/[\\"]/g, "\\$&");
 
-async function buildPass({ dir, cookbookDir, lang = "en", excludeFr = false }) {
+// slug = source basename — this is also the EN<->FR pairing key
+function buildPass({ dir, lang, suffix = "" }) {
   const index = [];
-  for (const file of listGram(dir).filter(
-    (f) => !f.includes("bases/") && (!excludeFr || !f.includes("/fr/")),
-  )) {
-    const { analyzed } = await runPipeline(file, { db: DB, lang });
-    const base = analyzed.result;
-    const slug = base.slug;
+  for (const file of listGram(dir, lang === "fr").filter((f) => !f.includes("bases/"))) {
+    const base = buildRecipe(file, lang);
+    const slug = basename(file, ".gram");
     const image = base.meta?.image;
 
-    const langSwitch = "{{LANGSWITCH}}";
     writeFileSync(
-      `${cookbookDir}/${slug}.qmd`,
+      `site/cookbook/${slug}${suffix}.qmd`,
       `---
 title: "${q(base.title)}"
-${lang === "fr" ? "lang: fr\n" : ""}category: "${q(base.meta?.category ?? "Uncategorized")}"
+category: "${q(base.meta?.category ?? "Uncategorized")}"
 total_time: "${q(base.metrics?.totalTime ?? 0)} min"
 portions: "${q(base.meta?.portions ?? "")}"
 ${image ? `image: "${q(image)}"\n` : ""}---
 
-${langSwitch}\n
 {{< gram-interactive src="${srcPath(file)}" lang="${lang}" >}}
 `,
     );
@@ -84,51 +91,36 @@ ${langSwitch}\n
   return index;
 }
 
-// same source basenames pair 1:1 across sources/ and sources/fr/
-const slugByBase = (idx, files) =>
-  Object.fromEntries(idx.map((r, i) => [files[i], r.slug]));
+const fr = buildPass({ dir: "site/sources", lang: "fr" });
+const en = buildPass({ dir: "site/sources/fr", lang: "en", suffix: ".en" });
 
-const enFiles = listGram("sources")
-  .filter((f) => !f.includes("bases/") && !f.includes("/fr/"))
-  .map((f) => basename(f, ".gram"));
-const en = await buildPass({
-  dir: "sources",
-  cookbookDir: "site/cookbook",
-  excludeFr: true,
-});
-const frFiles = listGram("sources/fr")
-  .filter((f) => !f.includes("bases/"))
-  .map((f) => basename(f, ".gram"));
-const fr = await buildPass({
-  dir: "sources/fr",
-  cookbookDir: "site/fr/cookbook",
-  lang: "fr",
-});
+// single-language recipes get a "translation welcome" callout
+const frSlugs = new Set(fr.map((r) => r.slug));
+const enSlugs = new Set(en.map((r) => r.slug));
+const CALLOUT = {
+  fr: (slug) =>
+    `::: {.callout-note appearance="simple"}\nCette recette n'existe qu'en anglais — une traduction est la bienvenue !\n:::\n\n`,
+  en: (slug) =>
+    `::: {.callout-note appearance="simple"}\nThis recipe is only available in French — a translation is warmly welcome!\n:::\n\n`,
+};
+for (const slug of frSlugs)
+  if (!enSlugs.has(slug)) {
+    const p = `site/cookbook/${slug}.qmd`;
+    writeFileSync(p, CALLOUT.fr(slug) + readFileSync(p, "utf8"));
+  }
+for (const slug of enSlugs)
+  if (!frSlugs.has(slug)) {
+    const p = `site/cookbook/${slug}.en.qmd`;
+    writeFileSync(p, CALLOUT.en(slug) + readFileSync(p, "utf8"));
+  }
 
-// resolve {{LANGSWITCH}} placeholders using basename→slug maps
-const enSlug = slugByBase(en, enFiles);
-const frSlug = slugByBase(fr, frFiles);
-for (const [base, s] of Object.entries(frSlug)) {
-  const p = `site/fr/cookbook/${s}.qmd`;
-  writeFileSync(
-    p,
-    readFileSync(p, "utf8").replace(
-      "{{LANGSWITCH}}",
-      `<nav class="lang-switch" aria-label="Language"><span class="lang-opt active" aria-current="true">FR</span>${enSlug[base] ? `<a class="lang-opt" href="../../cookbook/${enSlug[base]}.html" hreflang="en" lang="en">EN</a>` : ""}</nav>`,
-    ),
-  );
-}
-for (const [base, s] of Object.entries(enSlug)) {
-  const p = `site/cookbook/${s}.qmd`;
-  writeFileSync(
-    p,
-    readFileSync(p, "utf8").replace(
-      "{{LANGSWITCH}}",
-      `<nav class="lang-switch" aria-label="Language">${frSlug[base] ? `<a class="lang-opt" href="../fr/cookbook/${frSlug[base]}.html" hreflang="fr" lang="fr">FR</a>` : ""}<span class="lang-opt active" aria-current="true">EN</span></nav>`,
-    ),
-  );
-}
-
-writeFileSync("site/recipes-index.json", JSON.stringify(en, null, 2));
 writeFileSync("site/recipes-index-fr.json", JSON.stringify(fr, null, 2));
-console.log(`\n${en.length} EN + ${fr.length} FR recipes → site/`);
+writeFileSync("site/recipes-index-en.json", JSON.stringify(en, null, 2));
+
+const missing = [...frSlugs].filter((s) => !enSlugs.has(s)).length +
+  [...enSlugs].filter((s) => !frSlugs.has(s)).length;
+if (missing)
+  console.warn(
+    `⚠ ${missing} recipe(s) lack an EN/FR counterpart — published single-language, translation warmly encouraged`,
+  );
+console.log(`\n${fr.length} FR + ${en.length} EN recipes → site/cookbook/`);

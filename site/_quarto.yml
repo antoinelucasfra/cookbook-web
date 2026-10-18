@@ -3,8 +3,21 @@ project:
   output-dir: _site
   resources:
     - recipe-app.js
-    - recipes-index.json
     - recipes-index-fr.json
+    - recipes-index-en.json
+
+babelquarto:
+  mainlanguage: fr
+  languages: [en]
+  languagelinks: navbar
+  languagecodes:
+    - name: fr
+      text: "Français"
+    - name: en
+      text: "English"
+
+title-fr: "Cookbook"
+title-en: "Cookbook"
 
 website:
   title: "Cookbook"
@@ -14,25 +27,18 @@ website:
       - href: index.qmd
         text: Cookbook
       - href: browse.qmd
-        text: Browse
+        text: Parcourir
       - href: import.qmd
-        text: Import
-      - text: "🌐"
-        menu:
-          - text: "English"
-            href: index.qmd
-          - text: "Français"
-            href: fr/index.qmd
-  page-footer: "Cooked with [Gram](https://gram-lang.org) + Quarto"
+        text: Importer
+  page-footer: "Cuisiné avec [Gram](https://gram-lang.org) + Quarto"
 
 format:
   html:
     theme: cosmo
-    lang: en
+    lang: fr
     filters:
       - gram
     css:
-      - css/gram.css
       - css/gantt.css
       - css/app.css
     include-in-header: _partials/head.html

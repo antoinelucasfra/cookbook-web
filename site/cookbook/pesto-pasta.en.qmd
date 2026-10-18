@@ -1,0 +1,8 @@
+---
+title: "Pâtes au pesto"
+category: "Pâtes"
+total_time: "27 min"
+portions: "2"
+---
+
+{{< gram-interactive src="sources/pesto-pasta.gram" lang="en" >}}

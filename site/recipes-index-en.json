@@ -1,0 +1,191 @@
+[
+  {
+    "slug": "black-bean-walnut-tacos",
+    "title": "Tacos aux haricots noirs et noix",
+    "category": "Tacos",
+    "time": 52,
+    "portions": "6",
+    "source": "https://connoisseurusveg.com/vegan-tacos/",
+    "image": ""
+  },
+  {
+    "slug": "butternut-mac-and-cheese",
+    "title": "Mac and cheese à la courge butternut",
+    "category": "Pâtes",
+    "time": 90,
+    "portions": "6",
+    "source": "https://www.lovingitvegan.com/vegan-mac-and-cheese/",
+    "image": ""
+  },
+  {
+    "slug": "canneles",
+    "title": "Canelés",
+    "category": "Pâtisserie",
+    "time": 1516,
+    "portions": "10",
+    "source": "Classique de Bordeaux",
+    "image": ""
+  },
+  {
+    "slug": "chocolate-cake",
+    "title": "Gâteau au chocolat",
+    "category": "Dessert",
+    "time": 65,
+    "portions": "8",
+    "source": "Style brownie classique",
+    "image": ""
+  },
+  {
+    "slug": "creme-au-chocolat",
+    "title": "Crème au chocolat",
+    "category": "Pâtisserie",
+    "time": 16,
+    "portions": "6",
+    "source": "Classique familial français",
+    "image": ""
+  },
+  {
+    "slug": "crepes",
+    "title": "Crêpes",
+    "category": "Petit-déjeuner",
+    "time": 47.5,
+    "portions": "4",
+    "source": "Classique français",
+    "image": ""
+  },
+  {
+    "slug": "falafel",
+    "title": "Falafels faciles",
+    "category": "Plat",
+    "time": 105,
+    "portions": "12",
+    "source": "https://minimalistbaker.com/easy-vegan-falafel/",
+    "image": ""
+  },
+  {
+    "slug": "fudgy-vegan-brownies",
+    "title": "Brownies fondants végétaliens",
+    "category": "Dessert",
+    "time": 91,
+    "portions": "16",
+    "source": "https://www.lovingitvegan.com/vegan-brownies/",
+    "image": ""
+  },
+  {
+    "slug": "hummus",
+    "title": "Houmous",
+    "category": "Entrée",
+    "time": 21,
+    "portions": "4",
+    "source": "https://simple-veganista.com/homemade-hummus",
+    "image": ""
+  },
+  {
+    "slug": "lemon-tart",
+    "title": "Tarte au citron",
+    "category": "Pâtisserie",
+    "time": 205,
+    "portions": "8",
+    "source": "",
+    "image": ""
+  },
+  {
+    "slug": "pancakes",
+    "title": "Pancakes",
+    "category": "Petit-déjeuner",
+    "time": 17,
+    "portions": "2",
+    "source": "",
+    "image": ""
+  },
+  {
+    "slug": "pesto-asparagus-pasta",
+    "title": "Pâtes au pesto crémeux, asperges et haricots beurre",
+    "category": "Pâtes",
+    "time": 38,
+    "portions": "4",
+    "source": "https://www.cinnamonsnail.com/vegan-pesto-pasta/",
+    "image": ""
+  },
+  {
+    "slug": "pesto-pasta",
+    "title": "Pâtes au pesto",
+    "category": "Pâtes",
+    "time": 27,
+    "portions": "2",
+    "source": "À la génoise",
+    "image": ""
+  },
+  {
+    "slug": "thai-green-curry-tofu",
+    "title": "Curry vert thaï au tofu (végétalien)",
+    "category": "Thaï",
+    "time": 42,
+    "portions": "4",
+    "source": "https://cinnamonsnail.com/vegan-green-curry-tofu/",
+    "image": ""
+  },
+  {
+    "slug": "tomato-soup",
+    "title": "Soupe de tomates",
+    "category": "Soupe",
+    "time": 52,
+    "portions": "4",
+    "source": "Valeur sûre du soir",
+    "image": ""
+  },
+  {
+    "slug": "vegan-biryani",
+    "title": "Biryani végétarien de Hyderabad",
+    "category": "Riz",
+    "time": 125.5,
+    "portions": "6",
+    "source": "https://www.cinnamonsnail.com/vegan-biryani/",
+    "image": ""
+  },
+  {
+    "slug": "vegan-butter-chicken",
+    "title": "Poulet au beurre végétalien",
+    "category": "Curry",
+    "time": 54,
+    "portions": "4",
+    "source": "https://connoisseurusveg.com/vegan-butter-chicken/",
+    "image": ""
+  },
+  {
+    "slug": "vegan-chili",
+    "title": "Chili végétalien",
+    "category": "Chili",
+    "time": 76,
+    "portions": "6",
+    "source": "https://www.lovingitvegan.com/vegan-chili/",
+    "image": ""
+  },
+  {
+    "slug": "vegan-dan-dan-noodles",
+    "title": "Nouilles Dan Dan végétaliennes",
+    "category": "Chinois",
+    "time": 41.5,
+    "portions": "4",
+    "source": "https://www.connoisseurusveg.com/vegan-dan-dan-noodles/",
+    "image": ""
+  },
+  {
+    "slug": "vegan-lasagna",
+    "title": "Lasagne Végétalienne",
+    "category": "Plat principal",
+    "time": 59,
+    "portions": "8",
+    "source": "https://www.lovingitvegan.com/vegan-lasagna/",
+    "image": ""
+  },
+  {
+    "slug": "vegan-pad-thai",
+    "title": "Pad Thaï végétalien (Pad Mee Korat)",
+    "category": "Thaï",
+    "time": 140,
+    "portions": "2",
+    "source": "https://hot-thai-kitchen.com/vegan-pad-thai/",
+    "image": ""
+  }
+]

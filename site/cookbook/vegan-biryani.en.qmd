@@ -1,0 +1,8 @@
+---
+title: "Biryani végétarien de Hyderabad"
+category: "Riz"
+total_time: "125.5 min"
+portions: "6"
+---
+
+{{< gram-interactive src="sources/vegan-biryani.gram" lang="en" >}}

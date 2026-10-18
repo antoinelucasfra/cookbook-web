@@ -1,6 +1,0 @@
-title: recipe
-author: tonio
-version: 1.0.0
-contributes:
-  shortcodes:
-    - recipe.lua

@@ -1,12 +1,35 @@
 ---
-title: "Recipes"
-listing:
-  contents:
-    - cookbook/*.qmd
-    - "!fr/**"
-  type: grid
-  fields: [title, category, total_time]
-  field-display-names:
-    category: Category
-    total_time: Time
+title: "Bienvenue dans le Cookbook"
+lang: fr
 ---
+
+Ce site est un livre de recettes propulsé par [Gram](https://gram-lang.org), un
+format texte simple pour écrire des recettes, et [Quarto](https://quarto.org).
+Chaque recette est un fichier `.gram` compilé en page interactive au moment de
+la construction du site.
+
+## Comment suivre une recette
+
+- **Aperçu rapide** — en tête de chaque page, un tableau : les colonnes sont les
+  actions (Mélanger, Cuire, Enfourner…), les lignes listent ce qui y entre
+  (quantités mises à l'échelle automatiquement), et la cellule de droite donne
+  température et durée. Toute la recette en un coup d'œil.
+- **Étapes détaillées** — les instructions pas à pas, avec les mélanges
+  intermédiaires et une chronologie.
+- **Mode cuisine** — cliquez sur *Mode cuisine* sur une page de recette pour
+  dérouler les étapes mains libres ; l'étape en cours reste centrée pendant
+  que vous travaillez.
+
+Utilisez les **boutons d'échelle** (½×–3×) sur une page de recette pour ajuster
+les portions : chaque quantité, le tableau d'aperçu et les durées se mettent à
+jour instantanément.
+
+## Un exemple en direct
+
+{{< gram-interactive src="sources/pancakes.gram" lang="fr" scales="1" >}}
+
+## Où aller ensuite
+
+Le tableau **Parcourir** filtre et trie toutes les recettes par titre,
+catégorie, durée ou portions. L'onglet **Importer** permet de convertir une
+recette trouvée sur le web au format Gram et de la proposer au cookbook.

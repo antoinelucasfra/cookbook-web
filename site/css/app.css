@@ -123,49 +123,54 @@
   margin-top: 0;
 }
 
-/* --- language switcher --- */
-.lang-switch {
+/* --- browse table thumbnails --- */
+.browse-thumb {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.6rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.browse-thumb-fallback {
   display: inline-flex;
-  border: 1px solid var(--bs-border-color, #dee2e6);
-  border-radius: 999px;
-  overflow: hidden;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-}
-.lang-switch .lang-opt {
-  padding: 0.15rem 0.8rem;
-  text-decoration: none;
-}
-.lang-switch .lang-opt.active {
-  background: var(--cb-accent, var(--bs-primary, #0d6efd));
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
   color: #fff;
-  pointer-events: none;
+  background: var(--cb-accent, #16a34a);
 }
-.lang-switch a.lang-opt:hover:not(.active) {
-  background: var(--bs-tertiary-bg, #f8f9fa);
+.browse-thumb-fallback[data-cat="Petit-déjeuner"],
+.browse-thumb-fallback[data-cat="Breakfast"] {
+  background: #d97706;
+}
+.browse-thumb-fallback[data-cat="Dessert"],
+.browse-thumb-fallback[data-cat="Desserts"] {
+  background: #db2777;
+}
+.browse-thumb-fallback[data-cat="Pâtes"],
+.browse-thumb-fallback[data-cat="Pasta"] {
+  background: #ca8a04;
+}
+.browse-title-cell {
+  display: flex;
+  align-items: center;
 }
 
-/* --- listing cards --- */
-.listing-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+/* --- mobile: table and controls stay usable --- */
+.browse-controls {
+  flex-wrap: wrap;
 }
-.listing-card .card-title a {
-  color: inherit;
-  text-decoration: none;
-}
-/* card categories as chips */
-.quarto-grid-item .listing-categories .listing-category {
-  border-radius: 999px;
-  background: var(--cb-accent-soft);
-  color: var(--cb-accent-dark);
-  border: 0;
-  font-size: 0.8em;
-}
-/* text-only cards get a category-tinted banner instead of an image */
-.quarto-grid-item .card-attribution {
-  border-top: 2px solid var(--cb-accent-soft);
+@media (max-width: 768px) {
+  .browse-table {
+    display: block;
+    overflow-x: auto;
+  }
+  .browse-table th:nth-child(5),
+  .browse-table td:nth-child(5) {
+    display: none; /* source column off small screens */
+  }
 }
 
 /* --- print: clean recipe sheet --- */
@@ -175,7 +180,6 @@
   .recipe-toolbar,
   .cook-bar,
   .gantt-details,
-  .lang-switch,
   .page-footer,
   #toc-collapse,
   .toc-actions,

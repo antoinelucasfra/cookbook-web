@@ -5,18 +5,16 @@
   "scripts": {
     "build:data": "node build.mjs",
     "build:js": "esbuild client.js --bundle --format=iife --outfile=site/recipe-app.js",
-    "build:css": "cp node_modules/@gram-lang/renderer/gram.css node_modules/@gram-lang/renderer/gantt.css site/css/",
-    "build": "npm run build:data && npm run build:js && npm run build:css && cd site && quarto render && cd .. && node fix-fr-chrome.mjs --self-check",
-    "check": "gram check \"sources/**/*.gram\"",
+    "build": "npm run build:data && npm run build:js && Rscript -e \"babelquarto::render_website(project_path = 'site')\" && node self-check.mjs --site",
+    "check": "gram check \"site/sources/**/*.gram\"",
     "test": "node self-check.mjs",
     "serve": "python3 -m http.server 8801 -d site/_site"
   },
   "type": "commonjs",
   "devDependencies": {
-    "@gram-lang/cli": "^1.2.0",
-    "@gram-lang/renderer": "^1.2.0",
+    "@gram-lang/analyzer": "^1.2.0",
     "esbuild": "^0.28.2",
-    "js-yaml": "^5.3.0"
+    "yaml": "^2.9.0"
   },
   "allowScripts": {
     "esbuild@0.28.2": true

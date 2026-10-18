@@ -1,0 +1,8 @@
+---
+title: "Tarte au citron"
+category: "Pâtisserie"
+total_time: "205 min"
+portions: "8"
+---
+
+{{< gram-interactive src="sources/lemon-tart.gram" lang="en" >}}

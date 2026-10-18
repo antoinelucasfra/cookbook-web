@@ -1,2 +1,11 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
-<script src="recipe-app.js" defer></script>
+<script>
+  // main language (fr) renders at site root, en under /en/ — resolve the
+  // bundle path per document instead of hardcoding one relative path
+  (function () {
+    var s = document.createElement("script");
+    s.src = document.documentElement.lang === "fr" ? "recipe-app.js" : "../recipe-app.js";
+    s.defer = true;
+    document.head.appendChild(s);
+  })();
+</script>
