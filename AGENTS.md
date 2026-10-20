@@ -9,7 +9,7 @@ Agent-facing notes for maintaining this repo. Human docs live in `README.md`.
 ## Architecture
 
 ```
-site/sources/**/*.gram (FR) + site/sources/fr/*.gram (EN)
+site/sources/*.gram (EN) + site/sources/fr/*.gram (FR)
 site/.gram/ingredients.yaml (ingredient DB)
         └──> build.mjs ──> site/cookbook/<slug>.qmd (FR) + <slug>.en.qmd (EN)
                           + recipes-index-fr.json / recipes-index-en.json
@@ -56,8 +56,8 @@ them, so `_quarto-en.yml` navbar overrides are NOT used — EN-page chrome label
 
 Uses `@gram-lang/parser` → `@gram-lang/kitchen` → `@gram-lang/analyzer`
 (mass normalization, yields, nutrition). Recipe HTML compilation lives in the
-vendored gram extension (bundled `gram-compile.cjs`). The `gram check
-"site/sources/**/*.gram"` command validates all sources.
+vendored gram extension (bundled `gram-compile.cjs`). `npm run check` validates
+all sources.
 
 ### Ingredient DB
 
@@ -70,8 +70,8 @@ names/aliases.
 
 | Path | Description |
 | ------ | ------------- |
-| `site/sources/` | French recipe sources (`*.gram`) + `bases/` (reusable modules) |
-| `site/sources/fr/` | English recipe sources (`*.gram`) — yes, `fr` holds EN translations |
+| `site/sources/` | English recipe sources (`*.gram`) + `bases/` (reusable modules) |
+| `site/sources/fr/` | French recipe sources (`*.gram`), rendered at the site root |
 | `site/sources/_submissions/` | Community recipes from GitHub issues (PRs add files here) |
 | `site/.gram/ingredients.yaml` | Ingredient DB (densities, nutrition, EN+FR names) |
 | `site/.gram/config.yaml` | Gram configuration |
@@ -84,7 +84,7 @@ names/aliases.
 | `site/_site/` | Quarto rendered output (generated, gitignored) |
 | `site/css/` | `gantt.css` (vendored), `app.css` (site chrome; recipe styles in the extension) |
 | `site/recipe-app.js` | Bundled client JS (generated) |
-| `site/images/` | Recipe photos (`image:` front-matter in `.gram` points here) |
+| `site/images/` | Recipe photos (optional; create it when adding one) |
 | `site/cookbook/` | Generated recipe page pairs (FR + `.en.qmd`) |
 | `site/.quarto-gram-cache/` | Gram compilation cache (gitignored) |
 
@@ -94,7 +94,7 @@ names/aliases.
 npm install
 npm run build     # gram pipeline + esbuild + babelquarto render + self-check
 npm run serve     # python3 -m http.server 8801 -d site/_site
-npm run check     # gram check "site/sources/**/*.gram"
+npm run check     # parse + compile every .gram source
 npm test          # node self-check.mjs
 ```
 
@@ -104,7 +104,7 @@ Write `site/sources/<slug>.gram` (VS Code: "Gram - Recipe Language"
 extension), then:
 
 ```bash
-npx gram check "site/sources/**/*.gram"
+npm run check
 npm run build
 ```
 
@@ -115,7 +115,7 @@ npm run build
    JSON-LD → falls back to plain-text → converts units → emits downloadable
    `.gram` draft. Untagged items (`# review:` comment in draft) → review, then
    save under `site/sources/`, extend `site/.gram/ingredients.yaml` if needed,
-   then `npx gram check`.
+   then `npm run check`.
 
 ## Code conventions
 

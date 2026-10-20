@@ -1,8 +1,9 @@
 ---
-title: "Chocolate Pudding"
-category: "Dessert"
+title: "Crème au chocolat"
+lang: fr
+category: "Pâtisserie"
 total_time: "16 min"
 portions: "6"
 ---
 
-{{< gram-interactive src="sources/creme-au-chocolat.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/creme-au-chocolat.gram" lang="fr" >}}

@@ -1,8 +1,9 @@
 ---
-title: "Chocolate Cake"
+title: "Gâteau au chocolat"
+lang: fr
 category: "Dessert"
 total_time: "65 min"
 portions: "8"
 ---
 
-{{< gram-interactive src="sources/chocolate-cake.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/chocolate-cake.gram" lang="fr" >}}

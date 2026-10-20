@@ -1,6 +1,7 @@
 ---
-title: "Lasagne Végétalienne"
-category: "Plat principal"
+title: "The Best Vegan Lasagna"
+lang: en
+category: "Main Course"
 total_time: "59 min"
 portions: "8"
 ---

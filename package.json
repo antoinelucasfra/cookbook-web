@@ -6,7 +6,7 @@
     "build:data": "node build.mjs",
     "build:js": "esbuild client.js --bundle --format=iife --outfile=site/recipe-app.js",
     "build": "npm run build:data && npm run build:js && Rscript -e \"babelquarto::render_website(project_path = 'site')\" && node self-check.mjs --site",
-    "check": "gram check \"site/sources/**/*.gram\"",
+    "check": "node check-sources.mjs",
     "test": "node self-check.mjs",
     "serve": "python3 -m http.server 8801 -d site/_site"
   },

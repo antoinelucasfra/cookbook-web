@@ -29,7 +29,7 @@ const UNIT_MAP = {
 
 const QTY = String.raw`(?:\d+\s+\d*\/\d+|\d+\/\d+|\d+[.,]\d+|\d+|[¼½¾⅓⅔⅛⅜⅝⅞])`;
 const ING_RE = new RegExp(
-  `^(${QTY}(?:\\s*(?:to|-|–)\\s*${QTY})?)\\s*([a-zA-Z.]+)?\\.?\\s+(.+)$`,
+  `^(${QTY}(?:\\s*(?:to|-|–)\\s*${QTY})?)\\s*([a-zA-Z.]+(?:\\s+oz)?)?\\.?\\s+(.+)$`,
 );
 
 function fracToNum(s) {
@@ -75,6 +75,8 @@ const SIZE_RE = /^(large|medium|small|whole)s?$/;
 /** Split "carrots, diced" into name + prep note so slugs stay DB-clean. */
 function normalizeIng(d) {
   if (SIZE_RE.test(d.unit || "")) d.unit = "";
+  // "fl oz" / "fl. oz" → "floz" so UNIT_MAP and the tagger see one unit
+  if (d.unit) d.unit = d.unit.toLowerCase().replace(/[\s.]+/g, "");
   const parts = d.name.split(/,\s+/);
   if (parts.length > 1) {
     d.prep = parts.slice(1).join(", ").replace(/\.$/, "");
@@ -83,7 +85,7 @@ function normalizeIng(d) {
   return d;
 }
 
-function slugify(s) {
+export function slugify(s) {
   return (
     s
       .toLowerCase()
@@ -97,7 +99,7 @@ function slugify(s) {
 
 export function toGramQty(qtyStr, unitStr) {
   const qty = qtyStr.trim();
-  const unit = (unitStr || "").toLowerCase().replace(/\.$/, "");
+  const unit = (unitStr || "").toLowerCase().replace(/[\s.]+/g, "");
   if (UNIT_MAP[unit]) {
     // e.g. "2 cups" → "480 ml"; keep multi-range as-is with mapped unit appended per part is overkill — map the last unit only
     const [num, target] = [qty, UNIT_MAP[unit]];
@@ -113,6 +115,16 @@ export function toGramQty(qtyStr, unitStr) {
 
 /** Parse plain-text ingredient list + instructions into a gram draft. */
 export function parseRecipeText(text, titleHint = "") {
+  // a fetched HTML page without JSON-LD reaches us as raw markup
+  if (/<(?:!doctype|html|body|div|p|main|article|section|script|style)\b/i.test(text)) {
+    text = text
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      // keep block boundaries so minified HTML still yields one item per line
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(?:p|div|li|ul|ol|h[1-6]|section|article|tr|td|table)\s*>/gi, "\n")
+      .replace(/<[^>]+>/g, " ");
+  }
   const out = {
     title: titleHint || "",
     ingredients: [],
@@ -248,27 +260,49 @@ export function parseRecipeText(text, titleHint = "") {
   return out;
 }
 
+/** Parse every ld+json block without a DOM (Node/CLI). */
+function jsonLdBlocks(html) {
+  const blocks = [];
+  const re =
+    /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(html))) {
+    try {
+      blocks.push(JSON.parse(m[1].replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, "")));
+    } catch {
+      /* malformed block — skip */
+    }
+  }
+  return blocks;
+}
+
+function findRecipeNode(roots) {
+  const queue = Array.isArray(roots) ? [...roots] : [roots];
+  while (queue.length) {
+    const node = queue.shift();
+    if (!node || typeof node !== "object") continue;
+    if ((node["@type"] ?? []).toString().toLowerCase().includes("recipe"))
+      return node;
+    queue.push(...Object.values(node).flat());
+  }
+  return null;
+}
+
 /** Extract a schema.org Recipe from an HTML document string, or null. */
 export function extractJsonLdRecipe(html) {
+  if (typeof DOMParser === "undefined") return findRecipeNode(jsonLdBlocks(html));
   const doc = new DOMParser().parseFromString(html, "text/html");
+  const blocks = [];
   for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
     try {
-      const data = JSON.parse(
-        el.textContent.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, ""),
+      blocks.push(
+        JSON.parse(el.textContent.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, "")),
       );
-      const queue = Array.isArray(data) ? data : [data];
-      while (queue.length) {
-        const node = queue.shift();
-        if (!node || typeof node !== "object") continue;
-        if ((node["@type"] ?? []).toString().toLowerCase().includes("recipe"))
-          return node;
-        queue.push(...Object.values(node).flat());
-      }
     } catch {
       /* malformed ld+json — try next block */
     }
   }
-  return null;
+  return findRecipeNode(blocks);
 }
 
 /** JSON-LD Recipe object → parsed draft shape. */

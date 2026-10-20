@@ -1,5 +1,6 @@
 ---
-title: "Tacos aux haricots noirs et noix"
+title: "Vegan Black Bean & Walnut Tacos"
+lang: en
 category: "Tacos"
 total_time: "52 min"
 portions: "6"

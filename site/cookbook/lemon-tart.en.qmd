@@ -1,6 +1,7 @@
 ---
-title: "Tarte au citron"
-category: "Pâtisserie"
+title: "Lemon Tart"
+lang: en
+category: "Pastry"
 total_time: "205 min"
 portions: "8"
 ---

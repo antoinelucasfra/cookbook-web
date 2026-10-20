@@ -1,6 +1,7 @@
 ---
-title: "Mac and cheese à la courge butternut"
-category: "Pâtes"
+title: "Butternut Squash Mac and Cheese"
+lang: en
+category: "Pasta"
 total_time: "90 min"
 portions: "6"
 ---

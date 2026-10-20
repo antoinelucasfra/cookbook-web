@@ -1,6 +1,7 @@
 ---
-title: "Pad Thaï végétalien (Pad Mee Korat)"
-category: "Thaï"
+title: "Vegan Pad Thai (Pad Mee Korat)"
+lang: en
+category: "Thai"
 total_time: "140 min"
 portions: "2"
 ---

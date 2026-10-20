@@ -1,7 +1,7 @@
 name: Recipe submission → PR
 
 # Community recipes: an issue labeled `recipe-submission` whose body contains a
-# ```gram fenced block becomes a pull request into site/site/sources/_submissions/.
+# ```gram fenced block becomes a pull request into site/sources/_submissions/.
 # Review = merge the PR.
 
 on:
@@ -32,6 +32,12 @@ jobs:
           ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
         run: node .github/scripts/issue-to-gram.mjs
 
+      - name: Validate .gram draft
+        if: steps.extract.outputs.slug != ''
+        run: |
+          npm ci
+          node check-sources.mjs /tmp/submission.gram
+
       - name: Open PR
         if: steps.extract.outputs.slug != ''
         env:
@@ -45,14 +51,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          mkdir -p site/site/sources/_submissions
-          mv /tmp/submission.gram "site/site/sources/_submissions/${SLUG}.gram"
-          git add site/site/sources/_submissions
+          mkdir -p site/sources/_submissions
+          mv /tmp/submission.gram "site/sources/_submissions/${SLUG}.gram"
+          git add site/sources/_submissions
           git commit -m "recipe: ${SLUG} (from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR})"
           git push origin "$BRANCH"
           gh pr create \
             --title "Recipe: ${SLUG} (from issue #${ISSUE_NUMBER})" \
-            --body "Community submission from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR}. Review, move to \`site/sources/\` or \`site/sources/fr/\`, add ingredients to \`site/.gram/ingredients.yaml\`, then merge. Closes #${ISSUE_NUMBER}." \
+            --body "Community submission from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR}. Review, move to \`site/sources/\` (EN) or \`site/sources/fr/\` (FR), add ingredients to \`site/.gram/ingredients.yaml\`, then merge. Closes #${ISSUE_NUMBER}." \
             --label "recipe-review"
           gh issue comment "$ISSUE_NUMBER" \
             --body "Received — opened PR for \`${SLUG}\`. It will go live after review."

@@ -1,8 +1,9 @@
 ---
-title: "Creamy Pesto Pasta with Asparagus & Butter Beans"
-category: "Pasta"
-total_time: "36 min"
+title: "Pâtes au pesto crémeux, asperges et haricots beurre"
+lang: fr
+category: "Pâtes"
+total_time: "38 min"
 portions: "4"
 ---
 
-{{< gram-interactive src="sources/pesto-asparagus-pasta.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/pesto-asparagus-pasta.gram" lang="fr" >}}

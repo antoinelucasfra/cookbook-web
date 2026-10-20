@@ -1,5 +1,6 @@
 ---
-title: "Gâteau au chocolat"
+title: "Chocolate Cake"
+lang: en
 category: "Dessert"
 total_time: "65 min"
 portions: "8"

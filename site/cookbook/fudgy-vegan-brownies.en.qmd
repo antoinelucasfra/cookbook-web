@@ -1,7 +1,8 @@
 ---
-title: "Brownies fondants végétaliens"
+title: "Fudgy Vegan Brownies"
+lang: en
 category: "Dessert"
-total_time: "91 min"
+total_time: "92 min"
 portions: "16"
 ---
 

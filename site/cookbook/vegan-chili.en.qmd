@@ -1,5 +1,6 @@
 ---
-title: "Chili végétalien"
+title: "Vegan Chili"
+lang: en
 category: "Chili"
 total_time: "76 min"
 portions: "6"

@@ -1,6 +1,7 @@
 ---
-title: "Pâtes au pesto"
-category: "Pâtes"
+title: "Pesto Pasta"
+lang: en
+category: "Pasta"
 total_time: "27 min"
 portions: "2"
 ---

@@ -46,6 +46,7 @@
   }
   function normalizeIng(d) {
     if (SIZE_RE.test(d.unit || "")) d.unit = "";
+    if (d.unit) d.unit = d.unit.toLowerCase().replace(/[\s.]+/g, "");
     const parts = d.name.split(/,\s+/);
     if (parts.length > 1) {
       d.prep = parts.slice(1).join(", ").replace(/\.$/, "");
@@ -58,7 +59,7 @@
   }
   function toGramQty(qtyStr, unitStr) {
     const qty = qtyStr.trim();
-    const unit = (unitStr || "").toLowerCase().replace(/\.$/, "");
+    const unit = (unitStr || "").toLowerCase().replace(/[\s.]+/g, "");
     if (UNIT_MAP[unit]) {
       const [num, target] = [qty, UNIT_MAP[unit]];
       const val = num.split(/\s*(?:to|-|–)\s*/).map((p) => {
@@ -71,6 +72,9 @@
     return `${qty}${unit ? " " + unit : ""}`;
   }
   function parseRecipeText(text, titleHint = "") {
+    if (/<(?:!doctype|html|body|div|p|main|article|section|script|style)\b/i.test(text)) {
+      text = text.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(?:p|div|li|ul|ol|h[1-6]|section|article|tr|td|table)\s*>/gi, "\n").replace(/<[^>]+>/g, " ");
+    }
     const out = {
       title: titleHint || "",
       ingredients: [],
@@ -166,25 +170,42 @@
     if (titleHint) out.title = titleHint;
     return out;
   }
-  function extractJsonLdRecipe(html) {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
+  function jsonLdBlocks(html) {
+    const blocks = [];
+    const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    let m;
+    while (m = re.exec(html)) {
       try {
-        const data = JSON.parse(
-          el.textContent.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, "")
-        );
-        const queue = Array.isArray(data) ? data : [data];
-        while (queue.length) {
-          const node = queue.shift();
-          if (!node || typeof node !== "object") continue;
-          if ((node["@type"] ?? []).toString().toLowerCase().includes("recipe"))
-            return node;
-          queue.push(...Object.values(node).flat());
-        }
+        blocks.push(JSON.parse(m[1].replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, "")));
       } catch {
       }
     }
+    return blocks;
+  }
+  function findRecipeNode(roots) {
+    const queue = Array.isArray(roots) ? [...roots] : [roots];
+    while (queue.length) {
+      const node = queue.shift();
+      if (!node || typeof node !== "object") continue;
+      if ((node["@type"] ?? []).toString().toLowerCase().includes("recipe"))
+        return node;
+      queue.push(...Object.values(node).flat());
+    }
     return null;
+  }
+  function extractJsonLdRecipe(html) {
+    if (typeof DOMParser === "undefined") return findRecipeNode(jsonLdBlocks(html));
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const blocks = [];
+    for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      try {
+        blocks.push(
+          JSON.parse(el.textContent.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, ""))
+        );
+      } catch {
+      }
+    }
+    return findRecipeNode(blocks);
   }
   function jsonLdToDraft(r) {
     const ingredients = (r.recipeIngredient ?? r.ingredients ?? []).map((s) => {
@@ -336,7 +357,7 @@ ${stepLines.join("\n\n")}
       };
       QTY = String.raw`(?:\d+\s+\d*\/\d+|\d+\/\d+|\d+[.,]\d+|\d+|[¼½¾⅓⅔⅛⅜⅝⅞])`;
       ING_RE = new RegExp(
-        `^(${QTY}(?:\\s*(?:to|-|\u2013)\\s*${QTY})?)\\s*([a-zA-Z.]+)?\\.?\\s+(.+)$`
+        `^(${QTY}(?:\\s*(?:to|-|\u2013)\\s*${QTY})?)\\s*([a-zA-Z.]+(?:\\s+oz)?)?\\.?\\s+(.+)$`
       );
       SIZE_RE = /^(large|medium|small|whole)s?$/;
       TIME_RE = /[,;]?\s*(?:for |about )?(\d+)(?:\s*(?:to|-|–)\s*(\d+))?\s*(hours?|hrs?|h|minutes?|mins?|min|seconds?|secs?)\.?\s*$/i;
@@ -543,7 +564,7 @@ ${stepLines.join("\n\n")}
             if (recipe) {
               const draft = jsonLdToDraft(recipe);
               if (!draft.title) draft.title = parseRecipeText("").title || url;
-              emit(draft, { source: url, portions: String(recipe.recipeYield ?? "") });
+              emit(draft, { source: url, portions: draft.meta?.portions ?? "" });
             } else {
               emit(parseRecipeText(body, ""), { source: url });
             }
@@ -559,7 +580,7 @@ ${stepLines.join("\n\n")}
         document.querySelector("#import-download")?.addEventListener("click", () => {
           const gram = currentText();
           const title = gram.match(/^title: (.+)$/m)?.[1] ?? "recipe";
-          const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+          const slug = slugify(title);
           const a = document.createElement("a");
           a.href = URL.createObjectURL(new Blob([gram], { type: "text/plain" }));
           a.download = `${slug}.gram`;

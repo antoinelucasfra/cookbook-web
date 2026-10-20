@@ -1,6 +1,7 @@
 ---
-title: "Falafels faciles"
-category: "Plat"
+title: "Easy Vegan Falafel"
+lang: en
+category: "Main"
 total_time: "105 min"
 portions: "12"
 ---

@@ -1,6 +1,7 @@
 ---
 title: "Crêpes"
-category: "Petit-déjeuner"
+lang: en
+category: "Breakfast"
 total_time: "47.5 min"
 portions: "4"
 ---

@@ -1,8 +1,9 @@
 ---
-title: "Lemon Tart"
-category: "Pastry"
+title: "Tarte au citron"
+lang: fr
+category: "Pâtisserie"
 total_time: "205 min"
 portions: "8"
 ---
 
-{{< gram-interactive src="sources/lemon-tart.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/lemon-tart.gram" lang="fr" >}}

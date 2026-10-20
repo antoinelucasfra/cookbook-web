@@ -1,6 +1,7 @@
 ---
 title: "Pancakes"
-category: "Petit-déjeuner"
+lang: en
+category: "Breakfast"
 total_time: "17 min"
 portions: "2"
 ---

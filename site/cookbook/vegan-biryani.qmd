@@ -1,8 +1,9 @@
 ---
-title: "Hyderabadi Vegetable Biryani"
-category: "Rice"
-total_time: "121.5 min"
+title: "Biryani végétarien de Hyderabad"
+lang: fr
+category: "Riz"
+total_time: "125.5 min"
 portions: "6"
 ---
 
-{{< gram-interactive src="sources/vegan-biryani.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/vegan-biryani.gram" lang="fr" >}}

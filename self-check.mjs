@@ -1,4 +1,6 @@
-// self-check.mjs — asserts for import-parser; run: node self-check.mjs
+// self-check.mjs — asserts for import-parser + generated pages; run: node self-check.mjs
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import {
   parseRecipeText,
   extractJsonLdRecipe,
@@ -54,17 +56,27 @@ assert(
 assert(gram.includes("@spinach{480 ml}"), "gram cup conversion");
 assert(gram.includes("[Step 1] Soak"), "gram step");
 
-const html = `<html><script type="application/ld+json">{"@graph":[{"@type":"Article"},{"@type":"Recipe","name":"Tofu Curry","recipeYield":"4","recipeIngredient":["200 g tofu","1 cup rice"],"recipeInstructions":[{"text":"Fry."},{"text":"Simmer 10 min."}]}</script></html>`;
-// DOMParser not available in bare node — test jsonLd path via jsdom-free fallback:
-if (typeof DOMParser === "undefined") {
-  console.log("(DOMParser unavailable in node — skipping JSON-LD check)");
-} else {
-  const r = extractJsonLdRecipe(html);
-  assert(r?.name === "Tofu Curry", "jsonld name");
-  const d2 = jsonLdToDraft(r);
-  assert(d2.ingredients.length === 2, "jsonld ings");
-  assert(d2.steps[0] === "Fry.", "jsonld steps");
-}
+const html = `<html><script type="application/ld+json">{"@graph":[{"@type":"Article"},{"@type":"Recipe","name":"Tofu Curry","recipeYield":"4","recipeIngredient":["200 g tofu","1 cup rice"],"recipeInstructions":[{"text":"Fry."},{"text":"Simmer 10 min."}]}]}</script></html>`;
+// no DOMParser in node: the regex fallback must find the same Recipe node
+const r = extractJsonLdRecipe(html);
+assert(r?.name === "Tofu Curry", "jsonld name");
+const d2 = jsonLdToDraft(r);
+assert(d2.ingredients.length === 2, "jsonld ings");
+assert(d2.steps[0] === "Fry.", "jsonld steps");
+
+// fetched HTML without JSON-LD: tags become line breaks, not an empty draft
+const fromHtml = parseRecipeText(
+  "<html><body><h1>Tomato Soup</h1><p>Serves 4</p><h2>Ingredients</h2><ul><li>500 g tomatoes</li><li>1 onion</li></ul><h2>Instructions</h2><p>Simmer for 20 minutes.</p></body></html>",
+);
+assert(fromHtml.title === "Tomato Soup", `html title ${fromHtml.title}`);
+assert(
+  fromHtml.ingredients.length === 2,
+  `html ings ${fromHtml.ingredients.length}`,
+);
+assert(
+  fromHtml.steps.length === 1 && fromHtml.portions === "4",
+  `html steps/portions ${fromHtml.steps.length}/${fromHtml.portions}`,
+);
 
 // intro prose must not leak into steps
 const cake = parseRecipeText(`Best Chocolate Cake
@@ -132,6 +144,17 @@ assert(toGramQty("1", "gal") === "3800 ml", `gal ${toGramQty("1", "gal")}`);
 assert(
   toGramQty("2", "sticks") === "226 g",
   `stick ${toGramQty("2", "sticks")}`,
+);
+assert(
+  toGramQty("8", "fl oz") === "240 ml",
+  `fl oz ${toGramQty("8", "fl oz")}`,
+);
+const floz = parseRecipeText(
+  "Soup\n\nIngredients:\n- 8 fl oz milk\n\nInstructions:\nMix.",
+);
+assert(
+  floz.ingredients[0]?.name === "milk" && floz.ingredients[0]?.unit === "floz",
+  `fl oz parse ${JSON.stringify(floz.ingredients[0])}`,
 );
 
 // AI-needed tagging
@@ -204,9 +227,21 @@ assert(
   `to-taste name: "${messyIng.ingredients[1].name}"`,
 );
 
-console.log(
-  process.exitCode ? "SELF-CHECK FAILED" : "import-parser self-check OK",
-);
+// generated pages: source folder, slug, file and language must agree
+if (existsSync("site/cookbook")) {
+  for (const f of readdirSync("site/cookbook").filter((f) => f.endsWith(".qmd"))) {
+    const p = `site/cookbook/${f}`;
+    const src = readFileSync(p, "utf8");
+    const isEn = f.endsWith(".en.qmd");
+    const slug = f.replace(/\.en\.qmd$|\.qmd$/, "");
+    const lang = src.match(/^lang:\s*(\w+)/m)?.[1];
+    const ref = src.match(/\{\{<\s*gram-interactive[^>]*src="([^"]+)"/)?.[1] ?? "";
+    const expected = `sources/${isEn ? "" : "fr/"}${slug}.gram`;
+    assert(lang === (isEn ? "en" : "fr"), `${p}: lang is ${lang}`);
+    assert(ref === expected, `${p}: src ${ref} (expected ${expected})`);
+    assert(existsSync(`site/${ref}`), `${p}: missing source site/${ref}`);
+  }
+}
 
 // P0 regression cases: portions from draft, size descriptors, prep split, bare °F, temp-fragment lines
 {
@@ -247,48 +282,67 @@ console.log(
 
 // --- built-site checks: node self-check.mjs --site (after quarto render) ---
 if (process.argv.includes("--site")) {
-  import("node:fs").then(({ readFileSync, readdirSync, existsSync }) => {
-    const walkHtml = (dir) =>
-      readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
-        const p = `${dir}/${e.name}`;
-        return e.isDirectory()
-          ? walkHtml(p)
-          : p.endsWith(".html")
-            ? [p]
-            : [];
-      });
-    const pages = walkHtml("site/_site");
-    let bad = 0;
-    for (const p of pages) {
-      const html = readFileSync(p, "utf8");
-      if (html.includes("{{LANGSWITCH}}")) {
-        console.error(`FAIL: literal LANGSWITCH in ${p}`);
-        bad++;
-      }
-      if (html.includes("undefined.html")) {
-        console.error(`FAIL: undefined.html link in ${p}`);
+  const walkHtml = (dir) =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = `${dir}/${e.name}`;
+      return e.isDirectory()
+        ? walkHtml(p)
+        : p.endsWith(".html")
+          ? [p]
+          : [];
+    });
+  const pages = walkHtml("site/_site");
+  let bad = 0;
+  for (const p of pages) {
+    const html = readFileSync(p, "utf8");
+    if (html.includes("{{LANGSWITCH}}")) {
+      console.error(`FAIL: literal LANGSWITCH in ${p}`);
+      bad++;
+    }
+    if (html.includes("undefined.html")) {
+      console.error(`FAIL: undefined.html link in ${p}`);
+      bad++;
+    }
+    // local css/js must exist in _site (catches untracked or moved bundles)
+    for (const m of html.matchAll(/(?:href|src)="([^"]+\.(?:css|js))(?:\?[^"]*)?"/g)) {
+      const ref = m[1];
+      if (/^(?:[a-z]+:|\/)/i.test(ref)) continue;
+      const asset = resolve(dirname(p), ref.split("#")[0].split("?")[0]);
+      if (!existsSync(asset)) {
+        console.error(`FAIL: missing asset ${ref} in ${p}`);
         bad++;
       }
     }
-    // EN/FR parity of generated pages + index data
-    const fr = JSON.parse(readFileSync("site/recipes-index-fr.json", "utf8"));
-    const en = JSON.parse(readFileSync("site/recipes-index-en.json", "utf8"));
-    const frSlugs = new Set(fr.map((r) => r.slug));
-    const enSlugs = new Set(en.map((r) => r.slug));
-    const singles = [...frSlugs].filter((s) => !enSlugs.has(s));
-    const singlesEn = [...enSlugs].filter((s) => !frSlugs.has(s));
-    for (const s of [...singles, ...singlesEn])
-      console.warn(
-        `⚠ single-language recipe "${s}" — EN/FR translation warmly encouraged`,
-      );
-    if (!existsSync("site/_site/index.html"))
-      (console.error("FAIL: no site/_site/index.html"), bad++);
-    const enIndex = "site/_site/en/index.html";
-    if (existsSync("site/_site/en") && !existsSync(enIndex))
-      (console.error(`FAIL: missing ${enIndex}`), bad++);
-    console.log(
-      `${pages.length} pages checked, ${bad} failure(s) — ${bad ? "SITE CHECK FAILED" : "site self-check OK"}`,
+    // the inline loader resolves recipe-app.js against the app.css link
+    const cssHref = html.match(/<link[^>]+href="([^"]*css\/app\.css)"/)?.[1];
+    if (cssHref) {
+      const bundle = resolve(dirname(resolve(dirname(p), cssHref)), "../recipe-app.js");
+      if (!existsSync(bundle)) {
+        console.error(`FAIL: loader target missing for ${p}`);
+        bad++;
+      }
+    }
+  }
+  // EN/FR parity of generated pages + index data
+  const fr = JSON.parse(readFileSync("site/recipes-index-fr.json", "utf8"));
+  const en = JSON.parse(readFileSync("site/recipes-index-en.json", "utf8"));
+  const frSlugs = new Set(fr.map((r) => r.slug));
+  const enSlugs = new Set(en.map((r) => r.slug));
+  const singles = [...frSlugs].filter((s) => !enSlugs.has(s));
+  const singlesEn = [...enSlugs].filter((s) => !frSlugs.has(s));
+  for (const s of [...singles, ...singlesEn])
+    console.warn(
+      `⚠ single-language recipe "${s}" — EN/FR translation warmly encouraged`,
     );
-    if (bad) process.exitCode = 1;
-  });
+  if (!existsSync("site/_site/index.html"))
+    (console.error("FAIL: no site/_site/index.html"), bad++);
+  const enIndex = "site/_site/en/index.html";
+  if (existsSync("site/_site/en") && !existsSync(enIndex))
+    (console.error(`FAIL: missing ${enIndex}`), bad++);
+  console.log(
+    `${pages.length} pages checked, ${bad} failure(s) — ${bad ? "SITE CHECK FAILED" : "site self-check OK"}`,
+  );
+  if (bad) process.exitCode = 1;
 }
+
+console.log(process.exitCode ? "SELF-CHECK FAILED" : "self-check OK");

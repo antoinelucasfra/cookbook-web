@@ -1,6 +1,7 @@
 ---
-title: "Nouilles Dan Dan végétaliennes"
-category: "Chinois"
+title: "Vegan Dan Dan Noodles"
+lang: en
+category: "Chinese"
 total_time: "41.5 min"
 portions: "4"
 ---

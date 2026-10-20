@@ -1,6 +1,7 @@
 ---
-title: "Soupe de tomates"
-category: "Soupe"
+title: "Tomato Soup"
+lang: en
+category: "Soup"
 total_time: "52 min"
 portions: "4"
 ---

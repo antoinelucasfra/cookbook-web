@@ -1,5 +1,6 @@
 ---
-title: "Poulet au beurre végétalien"
+title: "Vegan Butter Chicken"
+lang: en
 category: "Curry"
 total_time: "54 min"
 portions: "4"

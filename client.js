@@ -8,6 +8,7 @@ import {
   jsonLdToDraft,
   draftToGram,
   aiNeededTags,
+  slugify,
 } from "./import-parser.mjs";
 
 // --- Browse page: filterable recipe table ---
@@ -234,7 +235,7 @@ function initImport() {
       if (recipe) {
         const draft = jsonLdToDraft(recipe);
         if (!draft.title) draft.title = parseRecipeText("").title || url;
-        emit(draft, { source: url, portions: String(recipe.recipeYield ?? "") });
+        emit(draft, { source: url, portions: draft.meta?.portions ?? "" });
       } else {
         emit(parseRecipeText(body, ""), { source: url });
       }
@@ -253,7 +254,7 @@ function initImport() {
   document.querySelector("#import-download")?.addEventListener("click", () => {
     const gram = currentText();
     const title = gram.match(/^title: (.+)$/m)?.[1] ?? "recipe";
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const slug = slugify(title);
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([gram], { type: "text/plain" }));
     a.download = `${slug}.gram`;

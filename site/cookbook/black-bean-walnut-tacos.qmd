@@ -1,8 +1,9 @@
 ---
-title: "Vegan Black Bean & Walnut Tacos"
+title: "Tacos aux haricots noirs et noix"
+lang: fr
 category: "Tacos"
 total_time: "52 min"
 portions: "6"
 ---
 
-{{< gram-interactive src="sources/black-bean-walnut-tacos.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/black-bean-walnut-tacos.gram" lang="fr" >}}

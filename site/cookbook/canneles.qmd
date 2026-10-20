@@ -1,8 +1,9 @@
 ---
-title: "Cannelés"
-category: "Pastry"
+title: "Canelés"
+lang: fr
+category: "Pâtisserie"
 total_time: "1516 min"
 portions: "10"
 ---
 
-{{< gram-interactive src="sources/canneles.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/canneles.gram" lang="fr" >}}

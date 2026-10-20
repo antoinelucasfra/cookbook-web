@@ -4,9 +4,9 @@ Recipe site powered by the [Gram DSL](https://gram-lang.org) + Quarto.
 
 ## Layout
 
-- `site/sources/**/*.gram` — source of truth (one file per recipe; `sources/fr/`
-  holds the English originals, FR recipes at the root — pairing key is the
-  basename; `sources/bases/` for reusable modules)
+- `site/sources/*.gram` — English originals; `site/sources/fr/*.gram` — French
+  (main language, rendered at the site root). Pairing key is the basename;
+  `site/sources/bases/` holds reusable modules
 - `site/.gram/ingredients.yaml` — ingredient DB (densities, yields, nutrition)
 - `build.mjs` — compiles each recipe once → metadata; writes per-recipe Quarto
   page pairs (`site/cookbook/<slug>.qmd` FR + `<slug>.en.qmd` EN) embedding
@@ -27,6 +27,7 @@ Recipe site powered by the [Gram DSL](https://gram-lang.org) + Quarto.
 
     npm install
     npm run build     # gram pipeline + esbuild + babelquarto render + site self-check
+    npm run check     # parse + compile every .gram source
     npm run serve     # http://127.0.0.1:8801
 
 ## Adding a recipe
@@ -37,11 +38,10 @@ Two ways:
    "Publish to the cookbook": it opens a prefilled GitHub issue. Adding the
    `recipe-submission` label to that issue makes CI open a PR with the `.gram`
    file in `site/sources/_submissions/`. Review, move it to `site/sources/`
-   (FR) or `site/sources/fr/` (EN), extend `site/.gram/ingredients.yaml` with
+   (EN) or `site/sources/fr/` (FR), extend `site/.gram/ingredients.yaml` with
    missing ingredients, merge.
 2. **Locally** — write `site/sources/<slug>.gram` (VS Code: "Gram - Recipe
-   Language" extension), then `npx gram check "site/sources/**/*.gram"` and
-   `npm run build`.
+   Language" extension), then `npm run check` and `npm run build`.
 
 Optional recipe photo: set `image: /images/<slug>.jpg` in the `.gram`
 front-matter and drop the file in `site/images/`. It shows as a thumbnail in
@@ -65,7 +65,7 @@ ingredients or steps; quantities missing; unfamiliar units) both in the UI and
 as a `# review:` comment in the draft — those flags mean an AI translation pass
 is recommended. Review the draft, save under `site/sources/`, extend
 `site/.gram/ingredients.yaml` with any missing ingredients, then
-`npx gram check`.
+`npm run check`.
 
 ## Bilingual site (FR / EN)
 
@@ -73,8 +73,8 @@ The site is multilingual thanks to
 [babelquarto](https://docs.ropensci.org/babelquarto/) (R package, part of the
 Quarto ecosystem): French is the main language and renders at the site root,
 English pages are the `*.en.qmd` files rendered under `en/`. Sources pair 1:1
-by basename: `site/sources/<slug>.gram` (FR) ↔ `site/sources/fr/<slug>.gram`
-(EN).
+by basename: `site/sources/<slug>.gram` (EN) ↔ `site/sources/fr/<slug>.gram`
+(FR).
 
 - babelquarto injects the language switcher in the navbar; `build.mjs` adds a
   "translation welcome" callout to single-language recipes and the site

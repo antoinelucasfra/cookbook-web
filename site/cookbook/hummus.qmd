@@ -1,8 +1,9 @@
 ---
-title: "Hummus"
-category: "Appetizer"
+title: "Houmous"
+lang: fr
+category: "Entrée"
 total_time: "21 min"
 portions: "4"
 ---
 
-{{< gram-interactive src="sources/hummus.gram" lang="fr" >}}
+{{< gram-interactive src="sources/fr/hummus.gram" lang="fr" >}}

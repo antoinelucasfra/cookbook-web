@@ -1,6 +1,7 @@
 ---
-title: "Crème au chocolat"
-category: "Pâtisserie"
+title: "Chocolate Pudding"
+lang: en
+category: "Dessert"
 total_time: "16 min"
 portions: "6"
 ---

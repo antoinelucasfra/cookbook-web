@@ -1,6 +1,7 @@
 ---
-title: "Canelés"
-category: "Pâtisserie"
+title: "Cannelés"
+lang: en
+category: "Pastry"
 total_time: "1516 min"
 portions: "10"
 ---

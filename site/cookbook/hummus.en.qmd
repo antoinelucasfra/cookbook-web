@@ -1,6 +1,7 @@
 ---
-title: "Houmous"
-category: "Entrée"
+title: "Hummus"
+lang: en
+category: "Appetizer"
 total_time: "21 min"
 portions: "4"
 ---
