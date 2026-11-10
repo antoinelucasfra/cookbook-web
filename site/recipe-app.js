@@ -60,7 +60,7 @@
   function toGramQty(qtyStr, unitStr) {
     const qty = qtyStr.trim();
     const unit = (unitStr || "").toLowerCase().replace(/[\s.]+/g, "");
-    if (UNIT_MAP[unit]) {
+    if (Object.hasOwn(UNIT_MAP, unit)) {
       const [num, target] = [qty, UNIT_MAP[unit]];
       const val = num.split(/\s*(?:to|-|–)\s*/).map((p) => {
         const n = fracToNum(p);
@@ -144,12 +144,14 @@
               name: m[3].replace(/\s*\(.*?\)\s*/g, " ").trim()
             })
           );
-        } else if (cleaned.split(/\s+/).length <= 6 && !/[.]$/.test(cleaned)) {
+          continue;
+        }
+        if (cleaned.split(/\s+/).length <= 6 && !/[.!?]\s+[A-Z]/.test(cleaned)) {
           out.ingredients.push(
             normalizeIng({ qty: "", unit: "", name: cleaned })
           );
+          continue;
         }
-        if (out.ingredients.at(-1)?.name === cleaned || m) continue;
       }
       if (mode !== "steps" && m && cleaned.length < 120) {
         out.ingredients.push(
@@ -252,7 +254,7 @@
       const unmapped = [
         ...new Set(
           draft.ingredients.filter(
-            (i) => i.qty && i.unit && !UNIT_MAP[i.unit] && !METRIC.test(i.unit)
+            (i) => i.qty && i.unit && !Object.hasOwn(UNIT_MAP, i.unit) && !METRIC.test(i.unit)
           ).map((i) => i.unit)
         )
       ];
@@ -311,10 +313,10 @@
       return `[Step ${idx + 1}] ${timer ? `${body}, ${timer}` : body}`;
     });
     return `${tagComment}---
-title: ${title}
+title: ${JSON.stringify(title)}
 portions: ${portions || 4}
 category: Imported
-source: "${meta.source ?? ""}"
+source: ${JSON.stringify(meta.source ?? "")}
 ---
 
 ## Ingredients
@@ -365,15 +367,41 @@ ${stepLines.join("\n\n")}
     }
   });
 
+  // browse-data.mjs
+  function fmtTime(min) {
+    if (min == null) return "";
+    const t = Math.round(min);
+    const h = Math.floor(t / 60), m = t % 60;
+    return h ? `${h} h ${m ? m + " min" : ""}`.trim() : `${m} min`;
+  }
+  function filterRecipes(recipes, q, cat) {
+    const needle = q.trim().toLowerCase();
+    return recipes.filter(
+      (r) => (!cat || r.category === cat) && (!needle || `${r.title} ${r.category} ${r.source}`.toLowerCase().includes(needle))
+    );
+  }
+  function imageSrc(image, fr) {
+    return /^https?:\/\//.test(image) ? image : (fr ? "" : "../") + image.replace(/^\//, "");
+  }
+  function sortRecipes(rows, key, asc) {
+    const cmp = (a, b) => {
+      const va = a[key], vb = b[key];
+      if (key === "portions") return (Number(va) || 0) - (Number(vb) || 0);
+      if (typeof va === "number" && typeof vb === "number") return va - vb;
+      return String(va).localeCompare(String(vb));
+    };
+    return [...rows].sort((a, b) => asc ? cmp(a, b) : -cmp(a, b));
+  }
+  var init_browse_data = __esm({
+    "browse-data.mjs"() {
+    }
+  });
+
   // client.js
   var require_client = __commonJS({
     "client.js"() {
       init_import_parser();
-      function fmtTime(min) {
-        if (min == null) return "";
-        const h = Math.floor(min / 60), m = Math.round(min % 60);
-        return h ? `${h} h ${m ? m + " min" : ""}`.trim() : `${m} min`;
-      }
+      init_browse_data();
       async function initBrowse() {
         const table = document.querySelector("#browse-table");
         if (!table) return;
@@ -393,15 +421,11 @@ ${stepLines.join("\n\n")}
         for (const c of cats) catSel.add(new Option(c, c));
         let sortKey = "title", sortAsc = true;
         function rows() {
-          const q = search.value.trim().toLowerCase();
-          const cat = catSel.value;
-          return recipes.filter(
-            (r) => (!cat || r.category === cat) && (!q || `${r.title} ${r.category} ${r.source}`.toLowerCase().includes(q))
-          ).sort((a, b) => {
-            const va = a[sortKey], vb = b[sortKey];
-            const c = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
-            return sortAsc ? c : -c;
-          });
+          return sortRecipes(
+            filterRecipes(recipes, search.value, catSel.value),
+            sortKey,
+            sortAsc
+          );
         }
         function render() {
           const rs = rows();
@@ -418,10 +442,9 @@ ${stepLines.join("\n\n")}
               link.textContent = r.title;
               const titleTd = document.createElement("td");
               titleTd.className = "browse-title-cell";
-              const imgPrefix = fr ? "images/" : "../images/";
               if (r.image) {
                 const img = document.createElement("img");
-                img.src = r.image.startsWith("http") ? r.image : `${imgPrefix}${r.slug}.jpg`;
+                img.src = imageSrc(r.image, fr);
                 img.alt = "";
                 img.loading = "lazy";
                 img.className = "browse-thumb";
@@ -563,7 +586,7 @@ ${stepLines.join("\n\n")}
             }
             if (recipe) {
               const draft = jsonLdToDraft(recipe);
-              if (!draft.title) draft.title = parseRecipeText("").title || url;
+              if (!draft.title) draft.title = url;
               emit(draft, { source: url, portions: draft.meta?.portions ?? "" });
             } else {
               emit(parseRecipeText(body, ""), { source: url });

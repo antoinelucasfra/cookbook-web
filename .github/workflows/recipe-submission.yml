@@ -33,29 +33,40 @@ jobs:
         run: node .github/scripts/issue-to-gram.mjs
 
       - name: Validate .gram draft
+        id: validate
         if: steps.extract.outputs.slug != ''
         run: |
           npm ci
-          node check-sources.mjs /tmp/submission.gram
+          node check-sources.mjs /tmp/submission.gram > /tmp/check.log 2>&1 || { cat /tmp/check.log; exit 1; }
+
+      - name: Comment when the draft does not compile
+        if: failure() && steps.validate.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          ERROR=$(head -1 /tmp/check.log 2>/dev/null || echo "validation failed")
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "The \`\`\`gram draft in this issue does not compile: \`$ERROR\`. Fix the block, then remove and re-add the \`recipe-submission\` label to retry."
 
       - name: Open PR
         if: steps.extract.outputs.slug != ''
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
           SLUG: ${{ steps.extract.outputs.slug }}
         run: |
           BRANCH="recipe/issue-${ISSUE_NUMBER}-${SLUG}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+          # -B so re-labelling an issue (retry) reuses the branch instead of failing
+          git checkout -B "$BRANCH"
           mkdir -p site/sources/_submissions
           mv /tmp/submission.gram "site/sources/_submissions/${SLUG}.gram"
           git add site/sources/_submissions
-          git commit -m "recipe: ${SLUG} (from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR})"
-          git push origin "$BRANCH"
+          git commit -m "recipe: ${SLUG} (from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR})" || echo "draft unchanged — branch already up to date"
+          git push --force origin "$BRANCH"
           gh pr create \
             --title "Recipe: ${SLUG} (from issue #${ISSUE_NUMBER})" \
             --body "Community submission from #${ISSUE_NUMBER} by @${ISSUE_AUTHOR}. Review, move to \`site/sources/\` (EN) or \`site/sources/fr/\` (FR), add ingredients to \`site/.gram/ingredients.yaml\`, then merge. Closes #${ISSUE_NUMBER}." \

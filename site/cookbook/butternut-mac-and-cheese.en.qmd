@@ -1,9 +1,6 @@
 ---
 title: "Butternut Squash Mac and Cheese"
 lang: en
-category: "Pasta"
-total_time: "90 min"
-portions: "6"
 ---
 
 {{< gram-interactive src="sources/butternut-mac-and-cheese.gram" lang="en" >}}

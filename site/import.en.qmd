@@ -2,7 +2,6 @@
 lang: en
 title: Import
 ---
-lang: en
 
 ## Import a recipe
 

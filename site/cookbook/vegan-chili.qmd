@@ -1,9 +1,6 @@
 ---
 title: "Chili végétalien"
 lang: fr
-category: "Chili"
-total_time: "76 min"
-portions: "6"
 ---
 
 {{< gram-interactive src="sources/fr/vegan-chili.gram" lang="fr" >}}

@@ -1,9 +1,6 @@
 ---
 title: "Vegan Pad Thai (Pad Mee Korat)"
 lang: en
-category: "Thai"
-total_time: "140 min"
-portions: "2"
 ---
 
 {{< gram-interactive src="sources/vegan-pad-thai.gram" lang="en" >}}

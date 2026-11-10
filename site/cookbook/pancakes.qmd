@@ -1,9 +1,6 @@
 ---
 title: "Pancakes"
 lang: fr
-category: "Petit-déjeuner"
-total_time: "17 min"
-portions: "2"
 ---
 
 {{< gram-interactive src="sources/fr/pancakes.gram" lang="fr" >}}

@@ -1,9 +1,6 @@
 ---
 title: "Crêpes"
 lang: en
-category: "Breakfast"
-total_time: "47.5 min"
-portions: "4"
 ---
 
 {{< gram-interactive src="sources/crepes.gram" lang="en" >}}

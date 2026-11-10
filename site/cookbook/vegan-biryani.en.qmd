@@ -1,9 +1,6 @@
 ---
 title: "Hyderabadi Vegetable Biryani"
 lang: en
-category: "Rice"
-total_time: "121.5 min"
-portions: "6"
 ---
 
 {{< gram-interactive src="sources/vegan-biryani.gram" lang="en" >}}

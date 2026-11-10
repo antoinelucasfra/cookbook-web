@@ -10,6 +10,13 @@ import {
   hasHardGaps,
   toGramQty,
 } from "./import-parser.mjs";
+import {
+  fmtTime,
+  filterRecipes,
+  sortRecipes,
+  imageSrc,
+} from "./browse-data.mjs";
+import yaml from "yaml";
 
 const assert = (cond, msg) => {
   if (!cond) {
@@ -48,7 +55,7 @@ assert(toGramQty("1 ½", "oz") === "42 g", `oz map ${toGramQty("1 ½", "oz")}`);
 assert(d.steps.length === 2, `steps ${d.steps.length}`);
 
 const gram = draftToGram(d, { portions: 2, source: "https://example.com" });
-assert(gram.includes("title: Vegan Pad Thai"), "gram title");
+assert(gram.includes('title: "Vegan Pad Thai"'), "gram title");
 assert(
   gram.includes("@dry-rice-noodles{112 g}"),
   `gram ing: ${gram.split("\n")[12]}`,
@@ -226,6 +233,94 @@ assert(
   messyIng.ingredients[1].name === "Sea salt" && !messyIng.ingredients[1].qty,
   `to-taste name: "${messyIng.ingredients[1].name}"`,
 );
+
+// draft front matter must survive any title and stay valid YAML
+{
+  const qtyLess = parseRecipeText(
+    "# T\n\n## Ingredients\n- 200 g flour\n- Salt, to taste.\n- Freshly ground black pepper.\n\n## Instructions\nMix.",
+  );
+  assert(
+    qtyLess.ingredients.length === 3,
+    `qty-less ingredients kept: ${JSON.stringify(qtyLess.ingredients.map((i) => i.name))}`,
+  );
+  assert(qtyLess.steps.length === 1, `no fake step from ingredient: ${qtyLess.steps}`);
+  assert(
+    toGramQty("2", "constructor") === "2 constructor",
+    `prototype unit: ${toGramQty("2", "constructor")}`,
+  );
+  for (const title of ["Pasta: my way", "Hash # tag", 'He said "hi"']) {
+    const dd = parseRecipeText(
+      `# ${title}\n\n## Ingredients\n- 1 egg\n\n## Instructions\nFry.`,
+    );
+    const fm = draftToGram(dd, { source: 'https://e.test/a"b' }).split("---")[1];
+    let title2;
+    try {
+      title2 = yaml.parse(fm).title;
+    } catch (e) {
+      assert(
+        false,
+        `front matter not valid YAML for ${JSON.stringify(title)}: ${e.message.split("\n")[0]}`,
+      );
+      continue;
+    }
+    assert(
+      title2 === title,
+      `front matter title round-trip: ${JSON.stringify(title2)}`,
+    );
+  }
+}
+
+// --- browse table logic (client.js renders from these) ---
+{
+  const rows = [
+    { title: "B", category: "Dinner", time: 90, portions: "10", source: "" },
+    { title: "A", category: "Breakfast", time: 5, portions: "2", source: "x" },
+    { title: "C", category: "Dinner", time: 20, portions: "8", source: "" },
+  ];
+  assert(
+    sortRecipes(rows, "portions", true)
+      .map((r) => r.portions)
+      .join() === "2,8,10",
+    `portions sort: ${sortRecipes(rows, "portions", true).map((r) => r.portions)}`,
+  );
+  assert(
+    sortRecipes(rows, "portions", false)
+      .map((r) => r.portions)
+      .join() === "10,8,2",
+    "portions sort desc",
+  );
+  assert(
+    sortRecipes(rows, "time", true)
+      .map((r) => r.time)
+      .join() === "5,20,90",
+    "time sort",
+  );
+  assert(
+    sortRecipes(rows, "title", true)
+      .map((r) => r.title)
+      .join() === "A,B,C",
+    "title sort",
+  );
+  assert(filterRecipes(rows, "", "Dinner").length === 2, "filter by category");
+  assert(filterRecipes(rows, "x", "").length === 1, "filter by query");
+  assert(filterRecipes(rows, "zzz", "").length === 0, "filter no match");
+  assert(fmtTime(17) === "17 min", `fmtTime 17: ${fmtTime(17)}`);
+  assert(fmtTime(119.5) === "2 h", `fmtTime 119.5: ${fmtTime(119.5)}`);
+  assert(fmtTime(125.5) === "2 h 6 min", `fmtTime 125.5: ${fmtTime(125.5)}`);
+  assert(fmtTime(null) === "", "fmtTime null");
+  assert(
+    imageSrc("/images/x.jpg", true) === "images/x.jpg",
+    `imageSrc fr: ${imageSrc("/images/x.jpg", true)}`,
+  );
+  assert(
+    imageSrc("/images/x.jpg", false) === "../images/x.jpg",
+    `imageSrc en: ${imageSrc("/images/x.jpg", false)}`,
+  );
+  assert(
+    imageSrc("https://e.test/x.jpg", true) === "https://e.test/x.jpg",
+    "imageSrc remote",
+  );
+}
 
 // generated pages: source folder, slug, file and language must agree
 if (existsSync("site/cookbook")) {

@@ -10,13 +10,14 @@ import {
   aiNeededTags,
   slugify,
 } from "./import-parser.mjs";
+import {
+  fmtTime,
+  filterRecipes,
+  sortRecipes,
+  imageSrc,
+} from "./browse-data.mjs";
 
 // --- Browse page: filterable recipe table ---
-function fmtTime(min) {
-  if (min == null) return "";
-  const h = Math.floor(min / 60), m = Math.round(min % 60);
-  return h ? `${h} h ${m ? m + " min" : ""}`.trim() : `${m} min`;
-}
 
 async function initBrowse() {
   const table = document.querySelector("#browse-table");
@@ -41,19 +42,11 @@ async function initBrowse() {
   let sortKey = "title", sortAsc = true;
 
   function rows() {
-    const q = search.value.trim().toLowerCase();
-    const cat = catSel.value;
-    return recipes
-      .filter(
-        (r) =>
-          (!cat || r.category === cat) &&
-          (!q || `${r.title} ${r.category} ${r.source}`.toLowerCase().includes(q))
-      )
-      .sort((a, b) => {
-        const va = a[sortKey], vb = b[sortKey];
-        const c = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb));
-        return sortAsc ? c : -c;
-      });
+    return sortRecipes(
+      filterRecipes(recipes, search.value, catSel.value),
+      sortKey,
+      sortAsc,
+    );
   }
 
   function render() {
@@ -71,12 +64,11 @@ async function initBrowse() {
         link.textContent = r.title;
         const titleTd = document.createElement("td");
         titleTd.className = "browse-title-cell";
-        // thumbnail: real photo when site/images/<slug>.jpg exists, else a
+        // thumbnail: real photo when the recipe declares one, else a
         // category-tinted initial badge (photos are optional)
-        const imgPrefix = fr ? "images/" : "../images/";
         if (r.image) {
           const img = document.createElement("img");
-          img.src = r.image.startsWith("http") ? r.image : `${imgPrefix}${r.slug}.jpg`;
+          img.src = imageSrc(r.image, fr);
           img.alt = "";
           img.loading = "lazy";
           img.className = "browse-thumb";
@@ -234,7 +226,7 @@ function initImport() {
       }
       if (recipe) {
         const draft = jsonLdToDraft(recipe);
-        if (!draft.title) draft.title = parseRecipeText("").title || url;
+        if (!draft.title) draft.title = url;
         emit(draft, { source: url, portions: draft.meta?.portions ?? "" });
       } else {
         emit(parseRecipeText(body, ""), { source: url });

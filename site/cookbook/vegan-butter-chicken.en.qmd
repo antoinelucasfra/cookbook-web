@@ -1,9 +1,6 @@
 ---
 title: "Vegan Butter Chicken"
 lang: en
-category: "Curry"
-total_time: "54 min"
-portions: "4"
 ---
 
 {{< gram-interactive src="sources/vegan-butter-chicken.gram" lang="en" >}}

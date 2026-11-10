@@ -1,9 +1,6 @@
 ---
 title: "Easy Vegan Falafel"
 lang: en
-category: "Main"
-total_time: "105 min"
-portions: "12"
 ---
 
 {{< gram-interactive src="sources/falafel.gram" lang="en" >}}

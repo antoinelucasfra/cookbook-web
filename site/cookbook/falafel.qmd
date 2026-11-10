@@ -1,9 +1,6 @@
 ---
 title: "Falafels faciles"
 lang: fr
-category: "Plat"
-total_time: "105 min"
-portions: "12"
 ---
 
 {{< gram-interactive src="sources/fr/falafel.gram" lang="fr" >}}
