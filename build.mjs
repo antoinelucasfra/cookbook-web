@@ -69,9 +69,6 @@ function buildPass({ dir, lang, suffix = "" }) {
       `---
 title: "${q(base.title)}"
 lang: ${lang}
-category: "${q(base.meta?.category ?? "Uncategorized")}"
-total_time: "${q(base.metrics?.totalTime ?? 0)} min"
-portions: "${q(base.meta?.portions ?? "")}"
 ${image ? `image: "${q(image)}"\n` : ""}---
 
 {{< gram-interactive src="${srcPath(file)}" lang="${lang}" >}}

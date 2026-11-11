@@ -17,9 +17,10 @@ Recipe site powered by the [Gram DSL](https://gram-lang.org) + Quarto.
   app (scale switcher, cook mode) — sync from the gram-quarto repo when it changes
 - `import-parser.mjs` — recipe text / schema.org JSON-LD → Gram draft (unit
   conversion to g/ml); self-check via `npm test`
-- `client.js` → `site/recipe-app.js` — the Browse page filter table (with
-  thumbnails), the Import page (URL / raw text → `.gram` draft → download or
-  "Publish" to GitHub), and EN-page chrome labels
+- `client.js` + `browse-data.mjs` → `site/recipe-app.js` — the Browse page filter
+  table (with thumbnails), the Import page (URL / raw text → `.gram` draft →
+  download or "Publish" to GitHub), and EN-page chrome labels; `browse-data.mjs`
+  holds the pure filter/sort helpers, checked by `npm test`
 - `site/` — Quarto website (multilingual, rendered by babelquarto; output
   `site/_site/`, French at the root, English under `en/`)
 

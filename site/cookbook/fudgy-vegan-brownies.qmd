@@ -1,9 +1,6 @@
 ---
 title: "Brownies fondants végétaliens"
 lang: fr
-category: "Dessert"
-total_time: "91 min"
-portions: "16"
 ---
 
 {{< gram-interactive src="sources/fr/fudgy-vegan-brownies.gram" lang="fr" >}}

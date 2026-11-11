@@ -2,7 +2,6 @@
 lang: en
 title: Browse
 ---
-lang: en
 
 Filter and sort all recipes by title, category, time, or portions. Scale buttons (½×–3×) and cook mode live on each recipe page — see [the home page](index.html) for the full guide.
 

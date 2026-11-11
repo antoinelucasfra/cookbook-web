@@ -1,9 +1,6 @@
 ---
 title: "Fudgy Vegan Brownies"
 lang: en
-category: "Dessert"
-total_time: "92 min"
-portions: "16"
 ---
 
 {{< gram-interactive src="sources/fudgy-vegan-brownies.gram" lang="en" >}}

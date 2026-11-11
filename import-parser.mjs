@@ -100,7 +100,7 @@ export function slugify(s) {
 export function toGramQty(qtyStr, unitStr) {
   const qty = qtyStr.trim();
   const unit = (unitStr || "").toLowerCase().replace(/[\s.]+/g, "");
-  if (UNIT_MAP[unit]) {
+  if (Object.hasOwn(UNIT_MAP, unit)) {
     // e.g. "2 cups" → "480 ml"; keep multi-range as-is with mapped unit appended per part is overkill — map the last unit only
     const [num, target] = [qty, UNIT_MAP[unit]];
     const val = num.split(/\s*(?:to|-|–)\s*/).map((p) => {
@@ -221,13 +221,20 @@ export function parseRecipeText(text, titleHint = "") {
             name: m[3].replace(/\s*\(.*?\)\s*/g, " ").trim(),
           }),
         );
-      } else if (cleaned.split(/\s+/).length <= 6 && !/[.]$/.test(cleaned)) {
-        // short qty-less lines like "Salt to taste"; longer prose is not an ingredient
+        continue;
+      }
+      // one fragment ("Salt, to taste.") is an ingredient; two sentences
+      // ("Mix all. Fry in pan.") are prose hiding under the header
+      if (
+        cleaned.split(/\s+/).length <= 6 &&
+        !/[.!?]\s+[A-Z]/.test(cleaned)
+      ) {
+        // short qty-less lines like "Salt to taste."; longer prose is not an ingredient
         out.ingredients.push(
           normalizeIng({ qty: "", unit: "", name: cleaned }),
         );
+        continue;
       }
-      if (out.ingredients.at(-1)?.name === cleaned || m) continue;
       // prose under Ingredients header — fall through to step handling
     }
     if (mode !== "steps" && m && cleaned.length < 120) {
@@ -360,7 +367,11 @@ export function aiNeededTags(draft) {
       ...new Set(
         draft.ingredients
           .filter(
-            (i) => i.qty && i.unit && !UNIT_MAP[i.unit] && !METRIC.test(i.unit),
+            (i) =>
+              i.qty &&
+              i.unit &&
+              !Object.hasOwn(UNIT_MAP, i.unit) &&
+              !METRIC.test(i.unit),
           )
           .map((i) => i.unit),
       ),
@@ -447,10 +458,10 @@ export function draftToGram(draft, meta = {}) {
     return `[Step ${idx + 1}] ${timer ? `${body}, ${timer}` : body}`;
   });
   return `${tagComment}---
-title: ${title}
+title: ${JSON.stringify(title)}
 portions: ${portions || 4}
 category: Imported
-source: "${meta.source ?? ""}"
+source: ${JSON.stringify(meta.source ?? "")}
 ---
 
 ## Ingredients

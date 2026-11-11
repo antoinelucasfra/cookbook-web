@@ -1,0 +1,17 @@
+name: Setup build environment
+description: Node, Quarto, R + babelquarto, then npm ci (shared by deploy and release)
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with: { node-version: 22, cache: npm }
+    - uses: quarto-dev/quarto-actions/setup@v2
+    - uses: r-lib/actions/setup-r@v2
+    - name: Install babelquarto
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq libcurl4-openssl-dev libssl-dev libxml2-dev libuv1-dev
+        Rscript -e 'install.packages("babelquarto", repos = c("https://ropensci.r-universe.dev", "https://cloud.r-project.org"))'
+    - run: npm ci
+      shell: bash

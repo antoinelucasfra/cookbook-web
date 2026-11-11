@@ -1,9 +1,6 @@
 ---
 title: "Vegan Thai Green Curry Tofu"
 lang: en
-category: "Thai"
-total_time: "44 min"
-portions: "4"
 ---
 
 {{< gram-interactive src="sources/thai-green-curry-tofu.gram" lang="en" >}}
